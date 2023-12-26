@@ -8,6 +8,7 @@ roomVariety::roomVariety() {
 	rType = 0;
 	price = 0;
 	availability = "";
+	pax = 0;
 }
 
 roomVariety::roomVariety(sql::ResultSet* data) {

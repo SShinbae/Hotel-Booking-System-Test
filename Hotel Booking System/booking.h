@@ -9,7 +9,7 @@
 class Booking
 {
 public:
-	std::string checkInDate, checkOutDate, roomType;
+	std::string checkInDate, checkOutDate, roomType, pax;
 	double value;
 
 	Booking(sql::ResultSet* data);

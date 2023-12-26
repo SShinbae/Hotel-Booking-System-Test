@@ -9,7 +9,7 @@
 class roomVariety
 {
 public:
-	int roomID, rType;
+	int roomID, rType, pax;
 	std::string name, availability;
 	double price;
 

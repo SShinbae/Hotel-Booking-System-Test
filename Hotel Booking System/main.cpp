@@ -25,7 +25,7 @@ void addFeedBack(Account user);
 
 void home(Account user);
 Account profile(Account user);
-Feedback viewFeedback(Account user, Feedback temp);
+Feedback viewFeedback(Account user,  Feedback view);
 void rooms(Account user);
 void feedback(Account user);
 Reservation roomType(Account user, int rType, Reservation trolley);
@@ -228,9 +228,6 @@ void loginMenu() {
 	}
 }
 void home(Account user) {
-	
-	//Feedback tempH;
-	//tempH.custId = user.customerID;
 
 	Menu homeMenus;
 	ArrowMenu homeMenu;
@@ -240,7 +237,7 @@ void home(Account user) {
 	homeMenu.addOption("Feedback");
 	//homeMenu.addOption("Logout");
 	while (1) {
-		homeMenu.header = "Welcome " + user.username;
+		homeMenu.header = "Welcome " + user.customerID;
 		switch (homeMenu.prompt())
 		{
 		case -1:
@@ -275,7 +272,7 @@ void feedback(Account user)
 
 	while (1)
 	{
-		feedM.header = "WMA Hotel Feedback ";
+		feedM.header = "WMA Hotel Feedback , " + user.name;
 		switch (feedM.prompt())
 		{
 		case -1:
@@ -296,86 +293,73 @@ void feedback(Account user)
 
 void addFeedBack(Account user) {
 
-	Feedback temp;
-	//temp.custId = user.customerID;
-	//fBack.customerID = user.customerID;
 	Feedback newFeed;
+	newFeed.user = user.customerID; //get current custID to insert to feedback table.
 
 	ArrowMenu feedM;
-	feedM.header = "Feedback Menu";
-	feedM.addOption("Types: ");
-	feedM.addOption("Messages: ");
+	feedM.header = "Feedback Menu , " + user.name;
+	feedM.addOption("Messages ");
 	feedM.addOption("Submit");
 
+	int option = 0;
 	while (1) {
-		
-	switch (feedM.prompt()) {
+
+		option = feedM.prompt(option);
+	switch (option) {
 		case -1:
 			return;
 			break;
 		case 0:
-			cout << "Insert Types:";
-			getline(cin, newFeed.feedBackTypes);
-			feedM.setValue(0, newFeed.feedBackTypes);
+			cout << "Insert Messages ";
+			getline(cin, newFeed.messages);
+			while (newFeed.messages.empty()) {
+				cout << "Messages cannot be empty. Please enter feedback messages: ";
+				getline(cin, newFeed.messages);
+			}
+			feedM.setValue(0, newFeed.messages);
 			break;
 		case 1:
-			cout << "Insert Messages:";
-			getline(cin, newFeed.messages);
-			feedM.setValue(1, newFeed.messages);
-			break;
-		case 2:
 			newFeed.insert();
 			cout << "Submit";
 			_getch();
 			return;
 			break;
+			
 		}
 	}
 }
 	
-Feedback viewFeedback(Account user, Feedback temp){
-	//Feedback fBack;
-	//fBack.custId = user.customerID;
+Feedback viewFeedback(Account user, Feedback view){
+	Feedback pengguna;
+	pengguna.user = user.customerID;
 
+	vector<Feedback> displayFeedback;
+	displayFeedback = Feedback::findFeedback(pengguna.user);
 	ArrowMenu cartM;
 	cartM.addOption("Back");
-	cartM.header = "Your Feedback";
+	stringstream tmpString;
 
-	vector<Feedback> dispF;
+	tmpString << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(40) << "Messages"
+		<< "|" << setw(20) << "Date & Time" << endl;
 
-	//dispF = Feedback::findFeedback(customerID);
-	//stringstream tmpString;
+	for (int i = 0; i < displayFeedback.size(); i++) {
+		tmpString << setw(5) << displayFeedback[i].feedBackId << "|" << setw(40) << displayFeedback[i].messages
+			<< "|" << setw(10) << displayFeedback[i].date << endl;
+	}
+	cartM.header = "Your Feedback " +user.name +"\n" + tmpString.str() ;
 
-	
-
-	
-		/*switch (cartM.prompt()) {
-		case -1:
-			return;
-
+	int option = 0;
+	while (1) {
+		
+		option = cartM.prompt(option);
+		switch (option)
+		{
 		case 0:
-			cout << "Back";
-			return;
+			return view ;
 			break;
-		}*/
-		//break;
-		cout << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(20) << "Messages"
-			<< "|" << setw(20) << "Feedback Types" << endl;
-		//tmpString.str("");
-		for (int i = 0; i < dispF.size(); i++) {
-			cout << setw(5) << dispF[i].feedBackId << "|" << setw(20) << dispF[i].messages
-				<< "|" << setw(10) << dispF[i].feedBackTypes << endl;
-
-			//cout << " ";
-
 		}
-		
-		
-	
-
-	return 0;
+	}
 }
-
 
 Account profile(Account user) {
 
@@ -513,7 +497,7 @@ void rooms(Account user) {
 	//roomMenu.addOption("Back");
 	while (1)
 	{
-		roomMenu.header = "Room \n Items in trolley:" +to_string(trolley.count()) + "\nTotal Price: " + to_string(trolley.total());
+		roomMenu.header = "Room \nItems in trolley:" +to_string(trolley.count()) + "\nTotal Price: " + to_string(trolley.total());
 		switch (roomMenu.prompt())
 		{
 		case -1:
@@ -653,12 +637,13 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley)
 	}
 
 	ArrowMenu productMenu;
-	productMenu.addOption("Add quantity");
+	productMenu.addOption("Add Quantity");
 	productMenu.addOption("Add Pax");
+	productMenu.addOption("Check-in Date");
 	productMenu.addOption("Add to cart");
 	productMenu.header = "Product Details:\n"
 		"\nName\t: " + rooms.name
-		+ "\nDescription\t: " + rooms.availability
+		+ "\nAvailable\t: " + rooms.availability
 		+ "\nPrice\t: " + to_string(rooms.price);
 	while (1) {
 		switch (productMenu.prompt())
@@ -676,15 +661,26 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley)
 			_getch();
 			break;
 		case 1:
-			cout << "Insert Quantity :";
+			cout << "Insert Pax :";
 			int pax;
 			cin >> pax;
 			if (pax > 0) {
-				trolley.addRoom(rooms, pax);
+				trolley.addPax(rooms, pax);
 			}
 			_getch();
 			break;
-		case 2:
+		/*case 2:
+			cout << "Check-in Date :";
+			string date;
+			cin >> date;
+			int numericDate = std::stoi(date);
+
+			if (numericDate > 0) {
+				trolley.addRoom(rooms, numericDate);
+			}
+			_getch();
+			break;*/
+		case 3:
 			cout << endl << "Product Added into cart";
 			_getch();
 			break;
@@ -718,7 +714,7 @@ Reservation trolleyMenu(Account user, Reservation trolley) {
 			confirm = _getch();
 			if (confirm == 'Y' || confirm == 'y') {
 				trolley.insert();
-				cout << "Transaction saved";
+				cout << "Booking Confirm";
 				_getch();
 				roomVariety(user); // go back to shop with empty cart
 			}
@@ -872,9 +868,9 @@ void booking(Account user) {
 int productCategorySelection() {
 	Menu categoryMnu;
 	categoryMnu.header = "TOGGLE CATEGORY";
-	categoryMnu.addOption("Apparel");
-	categoryMnu.addOption("Food");
-	categoryMnu.addOption("Furniture");
+	categoryMnu.addOption("Master Bedroom");
+	categoryMnu.addOption("Queen Bedroom");
+	categoryMnu.addOption("SIngle Bedroom");
 	while (1)
 	{
 		//since the selected option starts from 1

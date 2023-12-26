@@ -6,7 +6,7 @@ Booking::Booking(ResultSet* data) {
 	checkInDate = data->getString("checkInDate");
 	checkOutDate = data->getString("checkOutDate");
 	roomType = data->getString("roomType");
-	//pax = data->getInt(pax);
+	pax = data->getInt(pax);
 }
 
 std::vector<Booking> Booking::bookingConfirmation(std::string checkIn, std::string checkOut, std::vector<int> roomTypeId, bool sortByDate, bool ascending)
