@@ -94,7 +94,7 @@ void registerAccount() {
 	bool valid = true;
 	bool showPassword = false;
 	int option = 0;
-	string tmpPassword = "";// we use tempogary string for password since we will only encrypt when finishing process
+	string tmpPassword = "";// we use temporary string for password since we will only encrypt when finishing process
 	string inputIC = "";
 	while (1) {
 		if (showPassword) {
@@ -118,13 +118,13 @@ void registerAccount() {
 			break;
 		case 1:
 			cout << "Insert Number IC (991012110212):";
-			cin >> newacc.numIC;
-			if (newacc.numIC.length() > 12 || newacc.numIC.length() < 12) {
+			cin >> newacc.numIc;
+			if (newacc.numIc.length() > 12 || newacc.numIc.length() < 12) {
 				cout << "Number IC must be 12 character";
 				_getch();
 			}
 			else {
-				rgMenu.setValue(1, newacc.numIC);;
+				rgMenu.setValue(1, newacc.numIc);;
 			}
 			break;
 		case 2:
@@ -217,7 +217,19 @@ void loginMenu() {
 		case 2:
 			user.setPassword(tmpPassword);
 			if (user.login()) {
-				home(user);
+
+				if (user.getRole() == "admin")
+				{
+					home(user);
+				}
+				else if(user.getRole() == "user") {
+					home(user);
+				}
+			
+				else {
+					cout << "Unknown role for user.";
+					_getch();
+			}
 			}
 			else {
 				cout << "Invalid Login";
@@ -237,7 +249,7 @@ void home(Account user) {
 	homeMenu.addOption("Feedback");
 	//homeMenu.addOption("Logout");
 	while (1) {
-		homeMenu.header = "Welcome " + user.customerID;
+		homeMenu.header = "Welcome " + user.name;
 		switch (homeMenu.prompt())
 		{
 		case -1:
@@ -261,7 +273,7 @@ void home(Account user) {
 void feedback(Account user)
 {
 	Feedback fBack;
-	fBack.user = user.customerID; //put currently logged in user id into the feedback
+	fBack.user = user.userId; //put currently logged in user id into the feedback
 
 	Menu feedBack;
 	ArrowMenu feedM;
@@ -294,7 +306,7 @@ void feedback(Account user)
 void addFeedBack(Account user) {
 
 	Feedback newFeed;
-	newFeed.user = user.customerID; //get current custID to insert to feedback table.
+	newFeed.user = user.userId; //get current custID to insert to feedback table.
 
 	ArrowMenu feedM;
 	feedM.header = "Feedback Menu , " + user.name;
@@ -331,7 +343,7 @@ void addFeedBack(Account user) {
 	
 Feedback viewFeedback(Account user, Feedback view){
 	Feedback pengguna;
-	pengguna.user = user.customerID;
+	pengguna.user = user.userId;
 
 	vector<Feedback> displayFeedback;
 	displayFeedback = Feedback::findFeedback(pengguna.user);
@@ -383,7 +395,7 @@ Account profile(Account user) {
 	int option = 0;
 	while (1) {
 		profileMenu.setValue(0, temp.name);
-		profileMenu.setValue(1, temp.numIC);
+		profileMenu.setValue(1, temp.numIc);
 		profileMenu.setValue(2, temp.phoneNum);
 		profileMenu.setValue(3, temp.email);
 		profileMenu.setValue(4, temp.address);
@@ -398,16 +410,16 @@ Account profile(Account user) {
 			break;
 		case 0:
 			cout << "Insert Name:";
-			cin >> temp.name;
+			getline(cin,temp.name);
 			break;
 		case 1:
 			cout << "Insert Number IC (991012110212):";
-			cin >> temp.numIC;
-			if (temp.numIC.length() == 12) {
-				profileMenu.setValue(1, temp.numIC);
+			cin >> temp.numIc;
+			if (temp.numIc.length() == 12) {
+				profileMenu.setValue(1, temp.numIc);
 			}
 			else {
-				temp.numIC.length() > 12 || temp.numIC.length() < 12;
+				temp.numIc.length() > 12 || temp.numIc.length() < 12;
 				cout << "Number IC must be 12 character";
 				_getch();
 			}
@@ -425,13 +437,11 @@ Account profile(Account user) {
 			break;
 		case 3:
 			cout << "Insert email (utem@gmail.com):";
-			cin >> temp.email;
-			//profileMenu.setValue(3, temp.email);
+			getline(cin,temp.email);
 			break;
 		case 4:
 			cout << "Insert Address:";
-			cin >> temp.address;
-			//profileMenu.setValue(4, temp.address);
+			getline(cin,temp.address);
 			break;
 		case 5:
 			cout << "Insert Username:";
@@ -486,7 +496,7 @@ Account profile(Account user) {
 
 void rooms(Account user) {
 	Reservation trolley;
-	trolley.user = user.customerID;
+	trolley.user = user.userId;
 
 	ArrowMenu roomMenu;
 	roomMenu.footer = "Select Room Type";
