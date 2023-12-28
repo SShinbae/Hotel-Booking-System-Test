@@ -116,6 +116,9 @@ std::string Account::getRole()
 	return usertype;
 }
 
+void Account::setUsertype(const std::string& type) {
+	usertype = type;
+}
 
 Account::~Account() {
 

@@ -22,6 +22,8 @@ public:
 
     std::string getRole();
 
+    void setUsertype(const std::string& type);
+
     ~Account();
 
     void setPassword(std::string pass);
@@ -34,7 +36,7 @@ private:
     std::string encrypt(std::string input);
     char toChar(int asciiDecimal);
     bool isMatch(std::string encrypted, std::string testText);
-    //std::string usertype;
+    
     
 };
 

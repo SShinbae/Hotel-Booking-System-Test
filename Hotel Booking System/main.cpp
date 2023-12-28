@@ -76,6 +76,8 @@ int main() {
 void registerAccount() {
 	Account newacc;
 
+	newacc.setUsertype("user");
+
 	ArrowMenu rgMenu;
 	rgMenu.header = "Registration";
 	rgMenu.addOption("Name");
