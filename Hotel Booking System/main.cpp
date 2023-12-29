@@ -4,6 +4,7 @@
 #include <conio.h>
 #include <iomanip>
 #include <sstream>
+#include <stdexcept>
 
 // advanced
 // include our custom class
@@ -13,27 +14,37 @@
 #include "Room.h";
 #include "reservation.h"
 #include "booking.h"
+#include "AddRoom.h"
 #include "Arrowmenu.h"
 
 using namespace std;
 
 
-void registerAccount();
-void loginMenu();
+void registerAccount(); //register user
+void loginMenu(); // login menu
+
+//admin
+void homeAdmin(Account user);
+void feedbackAdmin(Account user);
+void bookingAdmin(Account user);
+void roomsAdmin(Account user);
+void addRoomTypeAdmin(Account user);
+void addRoomAdmin(Account user);
+void viewRoomAdmin(Account user);
+void searchRoomAdmin(Account user);
+
+//user
 void addFeedBack(Account user);
-
-
-void home(Account user);
+void homeUser(Account user);
+void bookingUser(Account user);
+void roomsUser(Account user);
+void feedbackUser(Account user);
 Account profile(Account user);
 Feedback viewFeedback(Account user,  Feedback view);
-void rooms(Account user);
-void feedback(Account user);
 Reservation roomType(Account user, int rType, Reservation trolley);
 Reservation roomDetails(Account user, int roomID, Reservation trolley);
 Reservation trolleyMenu(Account user, Reservation trolley);
 
-
-void booking(Account user);
 
 int productCategorySelection();
 
@@ -222,10 +233,10 @@ void loginMenu() {
 
 				if (user.getRole() == "admin")
 				{
-					home(user);
+					homeAdmin(user);
 				}
 				else if(user.getRole() == "user") {
-					home(user);
+					homeUser(user);
 				}
 			
 				else {
@@ -241,7 +252,7 @@ void loginMenu() {
 		}
 	}
 }
-void home(Account user) {
+void homeUser(Account user) {
 
 	Menu homeMenus;
 	ArrowMenu homeMenu;
@@ -261,88 +272,18 @@ void home(Account user) {
 			user = profile(user);
 			break;
 		case 1:
-			rooms(user);
+			roomsUser(user);
 			break;
 		case 2:
-			booking(user);
+			bookingUser(user);
 			break;
 		case 3:
-			feedback(user);
-			break;
-		}
-	}
-}
-void feedback(Account user)
-{
-	Feedback fBack;
-	fBack.user = user.userId; //put currently logged in user id into the feedback
-
-	Menu feedBack;
-	ArrowMenu feedM;
-	feedM.header = "Please Select ";
-	feedM.addOption("Add Feedback");
-	feedM.addOption("View Feedback");
-	feedM.addOption("Back");
-
-	while (1)
-	{
-		feedM.header = "WMA Hotel Feedback , " + user.name;
-		switch (feedM.prompt())
-		{
-		case -1:
-			return;
-			break;
-		case 0:
-			addFeedBack(user);
-			break;
-		case 1:
-			fBack = viewFeedback(user, fBack);
-			break;
-		case 2:
-			return;
+			feedbackUser(user);
 			break;
 		}
 	}
 }
 
-void addFeedBack(Account user) {
-
-	Feedback newFeed;
-	newFeed.user = user.userId; //get current custID to insert to feedback table.
-
-	ArrowMenu feedM;
-	feedM.header = "Feedback Menu , " + user.name;
-	feedM.addOption("Messages ");
-	feedM.addOption("Submit");
-
-	int option = 0;
-	while (1) {
-
-		option = feedM.prompt(option);
-	switch (option) {
-		case -1:
-			return;
-			break;
-		case 0:
-			cout << "Insert Messages ";
-			getline(cin, newFeed.messages);
-			while (newFeed.messages.empty()) {
-				cout << "Messages cannot be empty. Please enter feedback messages: ";
-				getline(cin, newFeed.messages);
-			}
-			feedM.setValue(0, newFeed.messages);
-			break;
-		case 1:
-			newFeed.insert();
-			cout << "Submit";
-			_getch();
-			return;
-			break;
-			
-		}
-	}
-}
-	
 Feedback viewFeedback(Account user, Feedback view){
 	Feedback pengguna;
 	pengguna.user = user.userId;
@@ -496,7 +437,7 @@ Account profile(Account user) {
 	}
 }
 
-void rooms(Account user) {
+void roomsUser(Account user) {
 	Reservation trolley;
 	trolley.user = user.userId;
 
@@ -745,11 +686,78 @@ Reservation trolleyMenu(Account user, Reservation trolley) {
 	}
 }
 
+void feedbackUser(Account user)
+{
+	Feedback fBack;
+	fBack.user = user.userId; //put currently logged in user id into the feedback
 
+	Menu feedBack;
+	ArrowMenu feedM;
+	feedM.header = "Please Select ";
+	feedM.addOption("Add Feedback");
+	feedM.addOption("View Feedback");
+	feedM.addOption("Back");
 
+	while (1)
+	{
+		feedM.header = "WMA Hotel Feedback , " + user.name;
+		switch (feedM.prompt())
+		{
+		case -1:
+			return;
+			break;
+		case 0:
+			addFeedBack(user);
+			break;
+		case 1:
+			fBack = viewFeedback(user, fBack);
+			break;
+		case 2:
+			return;
+			break;
+		}
+	}
+}
 
+void addFeedBack(Account user) {
 
-void booking(Account user) {
+	Feedback newFeed;
+	newFeed.user = user.userId; //get current userId to insert to feedback table.
+
+	ArrowMenu feedM;
+	feedM.header = "Feedback Menu , " + user.name;
+	feedM.addOption("Messages ");
+	feedM.addOption("Submit");
+
+	int option = 0;
+	while (1) {
+
+		option = feedM.prompt(option);
+		switch (option) {
+		case -1:
+			return;
+			break;
+		case 0:
+			cout << "Insert Messages ";
+			getline(cin, newFeed.messages);
+			while (newFeed.messages.empty()) {
+				cout << "Messages cannot be empty. Please enter feedback messages: ";
+				getline(cin, newFeed.messages);
+			}
+			feedM.setValue(0, newFeed.messages);
+			break;
+		case 1:
+			newFeed.insert();
+			cout << "Submit";
+			_getch();
+			return;
+			break;
+
+		}
+	}
+}
+
+void bookingUser(Account user) {
 
 	string checkOut, checkIn;
 	bool sortByDate = true, ascending = true;
@@ -869,7 +877,7 @@ void booking(Account user) {
 			break;
 		case 5:
 			result.clear();
-			result = Booking::bookingConfirmation(checkIn, checkOut,roomTypeId, sortByDate, ascending);
+			result = Booking::bookingConfirmation(checkIn, checkOut, roomTypeId, sortByDate, ascending);
 			break;
 		}
 
@@ -893,6 +901,202 @@ int productCategorySelection() {
 
 	}
 }
+
+//admin
+void homeAdmin(Account user) {
+
+	Menu homeMenus;
+	ArrowMenu homeMenu;
+	homeMenu.addOption("Profile");
+	homeMenu.addOption("Room");
+	homeMenu.addOption("Reservation");
+	homeMenu.addOption("Feedback");
+	//homeMenu.addOption("Logout");
+	while (1) {
+		homeMenu.header = "Welcome " + user.name;
+		switch (homeMenu.prompt())
+		{
+		case -1:
+			return;
+			break;
+		case 0:
+			user = profile(user);
+			break;
+		case 1:
+			roomsAdmin(user);
+			break;
+		case 2:
+			bookingAdmin(user);
+			break;
+		case 3:
+			feedbackAdmin(user);
+			break;
+		}
+	}
+}
+
+void feedbackAdmin(Account user) {
+
+}
+
+void bookingAdmin(Account user) {
+
+}
+
+void roomsAdmin(Account user) {
+	Bedroom newBedroom;
+
+	ArrowMenu bedroomM;
+	bedroomM.header = "Please Select One";
+	bedroomM.addOption("Add Room Type ");
+	bedroomM.addOption("Add Room ");
+	bedroomM.addOption("View Room ");
+	bedroomM.addOption("Search Room");
+
+
+	while (1)
+	{
+		switch (bedroomM.prompt()) {
+
+		case -1:
+			return;
+			break;
+		case 0:
+			addRoomTypeAdmin(user);
+			break;
+		case 1:
+			addRoomAdmin(user);
+			break;
+			/*case 2:
+				viewRoom(user):
+				break:*/
+				/*case 2:
+					searchRoom(user);
+					break:*/
+		}
+	}
+}
+
+void addRoomTypeAdmin(Account user)
+{
+	Bedroom newRoomType;
+
+	ArrowMenu roomAdd;
+	roomAdd.header = "Welcome to WMA Hotel , " + user.name;
+	roomAdd.addOption("Insert Room Type ");
+	roomAdd.addOption("Insert Room Capacity ");
+	roomAdd.addOption("Insert Room Description ");
+	roomAdd.addOption("Submit");
+
+	int option = 0;
+	while (1) {
+
+		option = roomAdd.prompt(option);
+		switch (option) {
+		case -1:
+			return;
+			break;
+		case 0:
+			cout << "Insert Room Type ";
+			getline(cin, newRoomType.type);
+			roomAdd.setValue(0, newRoomType.type);
+			break;
+		case 1:
+			cout << "Insert Room Capacity ";
+			cin >> newRoomType.capacity;
+			roomAdd.setValue(1, std::to_string(newRoomType.capacity));
+			break;
+		case 2:
+			cout << "Insert Room Description ";
+			getline(cin, newRoomType.description);
+			roomAdd.setValue(2, newRoomType.description);
+			break;
+		case 3:
+			newRoomType.insertRT();
+			cout << "Submit";
+			_getch();
+			return;
+			break;
+
+		}
+	}
+}
+
+void addRoomAdmin(Account user)
+{
+	Bedroom newRoom;
+	vector<Bedroom> displayRoom;
+	displayRoom = Bedroom::findBedroom();
+
+	ArrowMenu roomMenu;
+
+	roomMenu.addOption("Enter Room Type ID ");
+	roomMenu.addOption("Enter Room Name ");
+	roomMenu.addOption("Enter Room Price ");
+	roomMenu.addOption("Enter Availability ");
+	roomMenu.addOption("Submit ");
+	
+
+	//Display room type Menu
+	stringstream tmpAdmin;
+	roomMenu.display();
+	tmpAdmin << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(20) << "Type"
+		<< "|" << setw(20) << "Capacity" << "|" << setw(20) << "Description" << endl;
+
+	for (int i = 0; i < displayRoom.size(); i++) {
+		tmpAdmin << setw(5) << displayRoom[i].roomtypeID << "|" << setw(20)
+			<< displayRoom[i].type << "|" << setw(20)
+			<< displayRoom[i].capacity << "|" << setw(20) << displayRoom[i].description << endl;
+	}
+	roomMenu.header = "Please Select ID based on the table"  "\n" + tmpAdmin.str();
+	//cartM.header = "Your Feedback " + user.name + "\n" + tmpString.str();
+	
+	int option = 0;
+	while (1) {
+
+		option = roomMenu.prompt(option);
+		switch (option) {
+		case -1:
+			return;
+			break;
+		case 0:
+			cout << "Insert Room Type ID: ";
+			cin >> newRoom.rType;
+			roomMenu.setValue(0, std::to_string(newRoom.rType));
+			break;
+		case 1:
+			cout << "Insert Room Name: ";
+			cin.ignore(); // Add this line to consume the newline character
+			getline(cin, newRoom.name);
+			roomMenu.setValue(1, newRoom.name);
+			break;
+		case 2:
+			cout << "Insert Room Price: ";
+			cin >> newRoom.price;
+			roomMenu.setValue(2, std::to_string(newRoom.price));
+			break;
+		case 3:
+			cout << "Insert Room Availability (YES OR NO): ";
+			cin.ignore();
+			getline(cin, newRoom.description);
+			roomMenu.setValue(3, newRoom.description);
+			break;
+		case 4:
+			newRoom.insertR();
+			cout << "Submit";
+			_getch();
+			return;
+			break;
+
+		}
+	}
+}
+
+
+
+
+
+
 
 bool isNumeric(string input) {
 	for (int i = 0; i < input.length(); i++) {

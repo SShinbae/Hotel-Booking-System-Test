@@ -110,6 +110,11 @@ void ArrowMenu::addOption(string text, string value) {
 void ArrowMenu::clearOption() {
 	items.clear();
 }
+void ArrowMenu::display(){
+	for (size_t i = 0; i < items.size(); ++i) {
+        std::cout << i << ". " << items[i].first << std::endl;
+    }
+}
 void ArrowMenu::setValue(int index, string value) {
 	if (index >= 0 && index < items.size()) {
 		items[index].second = value;

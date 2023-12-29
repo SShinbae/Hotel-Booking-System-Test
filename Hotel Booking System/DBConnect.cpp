@@ -1,5 +1,4 @@
 #include "DBConnect.h"
-#include "DBConnect.h"
 #include <conio.h>
 
 using namespace std;

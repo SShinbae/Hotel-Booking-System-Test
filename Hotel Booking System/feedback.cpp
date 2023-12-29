@@ -82,12 +82,7 @@ std::vector<Feedback> Feedback::findFeedback(int user)
 	DBConnection db;
 	
 	db.prepareStatement(query);
-	/*
-	db.stmt->setInt(1, messages);
-	db.stmt->setDouble(3, minPrice);
-	db.stmt->setDouble(4, maxPrice);
-	db.stmt->setInt(3, feedBackId);
-	*/
+	
 	db.stmt->setInt(1, user);
 
 	vector<Feedback> products;

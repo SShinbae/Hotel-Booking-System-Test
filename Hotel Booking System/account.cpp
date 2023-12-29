@@ -115,7 +115,7 @@ std::string Account::getRole()
 {
 	return usertype;
 }
-
+//to get usertype == user
 void Account::setUsertype(const std::string& type) {
 	usertype = type;
 }
