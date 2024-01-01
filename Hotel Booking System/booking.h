@@ -9,13 +9,24 @@
 class Booking
 {
 public:
-	std::string checkInDate, checkOutDate, roomType, pax;
-	double value;
+	int reservationID, rID, quantity, pax, user;
+	std::string checkInDate, checkOutDate, roomName;
+	double price;
+	Booking();
 
 	Booking(sql::ResultSet* data);
 
-	static std::vector<Booking> bookingConfirmation(std::string checkIn, std::string checkOut, std::vector<int> roomTypeId, bool sortByDate, bool ascending);
+	Booking(int reservationID, int rID, int quantity, int pax, int user, int price, std::string checkInDate, std::string checkOutDate, std::string roomName);
+
+	static std::vector<Booking> bookingConfirmation(int reservationID, int rID, int quantity, int pax,
+		int user,int price, std::string checkInDate, std::string checkOutDate,std::string roomName);
 	
+	void insert();
+
+	static std::vector<Booking> findBooking(int user);
+	std::vector<Booking> findBookingAdmin();
+
+
 	~Booking() {
 
 	};

@@ -37,8 +37,8 @@ void searchRoomAdmin(Account user);
 //user
 void addFeedBack(Account user);
 void homeUser(Account user);
-void bookingUser(Account user);
-void roomsUser(Account user);
+Booking bookingUser(Account user, Booking view);
+Bedroom roomsUser(Account user, Reservation trolley);
 Reservation roomsUser2(Account user, int roomID, Reservation trolley);
 void feedbackUser(Account user);
 Account profile(Account user);
@@ -258,6 +258,10 @@ void loginMenu() {
 }
 void homeUser(Account user) {
 
+	Booking vBack;
+	Bedroom vRoom;
+	Reservation vRoom2;
+
 	Menu homeMenus;
 	ArrowMenu homeMenu;
 	homeMenu.addOption("Profile");
@@ -276,10 +280,10 @@ void homeUser(Account user) {
 			user = profile(user);
 			break;
 		case 1:
-			roomsUser(user);
+			vRoom = roomsUser(user, vRoom2);
 			break;
 		case 2:
-			bookingUser(user);
+			vBack = bookingUser(user, vBack);
 			break;
 		case 3:
 			feedbackUser(user);
@@ -441,40 +445,49 @@ Account profile(Account user) {
 	}
 }
 
-void roomsUser(Account user) {
-	Reservation trolley;
-	trolley.user = user.userId;
+Bedroom roomsUser(Account user, Reservation trolley) {
+
+	vector<Bedroom> rumah;
 
 	ArrowMenu roomMenu;
-	roomMenu.footer = "Select Room Type";
-	roomMenu.addOption("Master Bedroom");
-	roomMenu.addOption("Queen Bedroom");
-	roomMenu.addOption("Single Bedroom");
-	roomMenu.addOption("View Cart");
-	//roomMenu.addOption("Back");
-	while (1)
-	{
-		roomMenu.header = "Room \nItems in trolley:" +to_string(trolley.count()) + "\nTotal Price: " + to_string(trolley.total());
-		switch (roomMenu.prompt())
-		{
-		case -1:
-			return;
-			break;
-		case 0:
-			trolley = roomType(user, 1,trolley);
-			break;
-		case 1:
-			trolley = roomType(user, 2, trolley);
-			break;
-		case 2:
-			trolley = roomType(user, 3, trolley);
-			break;
-		case 3:
-			trolley = trolleyMenu(user, trolley);
-			break;
+	roomMenu.footer = "WMA HOTEL";
+	roomMenu.bullet = "";
+	roomMenu.header = "Please Select Room Type " + user.name;
+	
+	ArrowMenu productSelect;
+	productSelect.bullet = ""; //we dont want bullet here
+	
+	int selectedProduct = 0;
+	rumah = Bedroom::findBedroom();
+	roomMenu.clearOption();
+	stringstream tmpString;
+	tmpString << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(10) << "Type" << "|"
+		<< setw(10) << "Description"
+		<< "|" << setw(5) << "Capacity" << "|" << endl;
 
+	roomMenu.header = tmpString.str();
+	tmpString.str("");
+	for (int i = 0; i < rumah.size(); i++) {
+		tmpString << fixed << setw(10) << rumah[i].roomtypeID << "|" 
+			<< setw(10) << rumah[i].type << "|" << setw(20) << rumah[i].description
+			<< "|" << setw(5) << rumah[i].capacity << "|" << endl;
+		roomMenu.addOption(tmpString.str());
+		tmpString.str("");
+
+	}
+	
+	while (1) {
+		
+		selectedProduct = roomMenu.prompt(selectedProduct);
+		if (selectedProduct != -1) { // if not escape pressed process it
+			trolley = roomDetails(user, rumah[selectedProduct].roomtypeID, trolley);
+		}
+		else {
+			return 0;
+			break;
 		}
 	}
+	return 0;
 }
 
 
@@ -767,130 +780,41 @@ void addFeedBack(Account user) {
 	}
 }
 
-void bookingUser(Account user) {
+Booking bookingUser(Account user, Booking view) {
 
-	string checkOut, checkIn;
-	bool sortByDate = true, ascending = true;
-	vector<int> roomTypeId;
+	Booking pengguna;
+	pengguna.user = user.userId;
 
-	ArrowMenu bookingMenu;
-	bookingMenu.addOption("Start");
-	bookingMenu.addOption("End");
-	bookingMenu.addOption("Start");
-	bookingMenu.addOption("Start");
-	bookingMenu.setValue(3, "Date");
-	bookingMenu.addOption("Order");
-	bookingMenu.setValue(4, "Ascending");
-	bookingMenu.addOption("Generate");
+	vector<Booking> displayBooking;
+	displayBooking = Booking::findBooking(pengguna.user);
+	ArrowMenu cartM;
+	cartM.addOption("Back");
+	stringstream tmpString;
 
-	vector<Booking> result;
+	tmpString << fixed << setprecision(2) << setw(5) << "BID" << "|" << setw(5) << "Room Name"
+		<< "|" << setw(5) << "Quantity"<< "|" << setw(5) << "Pax" << "|" 
+		<< setw(15) << "Check In Date" << "|" << setw(15) << "Check Out Date" << "|" 
+		<< setw(10) << "Price" << "|" << endl;
 
-	string roomName[] = { "None","Master Bedroom", "Queen Bedroom", "Single Bedroom" };
+	for (int i = 0; i < displayBooking.size(); i++) {
+		tmpString << setw(5) << displayBooking[i].reservationID << "|" << setw(5) << displayBooking[i].roomName << "|"
+			<< setw(5) << displayBooking[i].quantity<< "|" << setw(5) << displayBooking[i].pax << "|" 
+			<< setw(15) << displayBooking[i].checkInDate << "|" 
+			<< setw(15) << displayBooking[i].checkOutDate << "|" 
+			<< setw(10) << displayBooking[i].price << "|" << endl;
+	}
+	cartM.header = "Your Booking " + user.name + "\n" + tmpString.str();
 
-	string selectedCategoryName;
-	int tmpSelectedCategory;
-
-	vector<int>::iterator iterator; //iterator is declare using what we are iterating, in this case it is vector of integer
 	int option = 0;
-	while (1)
-	{
+	while (1) {
 
-		selectedCategoryName = "";
-		if (roomTypeId.empty()) {
-			selectedCategoryName = "NONE";
-		}
-		else {
-			for (int i = 0; i < roomTypeId.size(); i++) {
-				selectedCategoryName += roomName[roomTypeId[i]] + ", ";
-			}
-		}
-		bookingMenu.setValue(2, selectedCategoryName);
-
-
-
-		// report display
-		stringstream ss;
-		// construct our report header
-		ss << endl << "--- Booking Details ---" << endl << "|" << setw(20) << "Date Check In" << "|";
-		if (!roomTypeId.empty()) {
-			// if category id not empty we add category column
-			ss << setw(20) << "Room Type" << "|";
-		}
-		ss << setw(20) << "Quantity" << "|";
-
-		double totalSale = 0;
-		// repeat same structure for content of the report
-		for (int i = 0; i < result.size(); i++) {
-			ss << endl << "|" << setw(20) << result[i].checkInDate.substr(0, 7) << "|";
-			if (!roomTypeId.empty()) {
-				// if category id not empty we add category column
-				ss << setw(20) << result[i].roomType << "|";
-			}
-			//ss << setw(20) << result[i].value << "|";
-			//totalSale += result[i].value;
-
-		}
-
-		ss << endl << "|" << setw(20) << "Total Sale" << "|";
-		if (!roomTypeId.empty()) {
-			// if category id not empty we add category column
-			ss << setw(20) << "" << " ";
-		}
-		ss << setw(20) << totalSale << "|";
-
-		ss << endl << "--- END OF Booking ---" << endl;
-		bookingMenu.header = ss.str();
-
-		option = bookingMenu.prompt(option);
+		option = cartM.prompt(option);
 		switch (option)
 		{
-		case -1:
-			return;
-			break;
 		case 0:
-			cout << "Insert start date (yyyy-mm-dd): ";
-			cin >> checkIn;
-			bookingMenu.setValue(0, checkIn);
-			break;
-		case 1:
-			cout << "Insert end date (yyyy-mm-dd): ";
-			cin >> checkOut;
-			bookingMenu.setValue(1, checkOut);
-			break;
-		case 2: //toggle category
-			tmpSelectedCategory = productCategorySelection();
-
-			//find the selcted category id inside our categoryIds vector
-			iterator = find(roomTypeId.begin(), roomTypeId.end(), tmpSelectedCategory);
-
-			if (iterator == roomTypeId.end()) {//if the iterator reaches the end means not found
-				roomTypeId.push_back(tmpSelectedCategory);
-			}
-			else {
-				roomTypeId.erase(iterator); //if it exist erase it
-			}
-
-			break;
-		case 3:// sort by
-			sortByDate = !sortByDate;
-			if (sortByDate)
-				bookingMenu.setValue(3, "Date");
-			else
-				bookingMenu.setValue(3, "Price");
-			break;
-		case 4:
-			ascending = !ascending;
-			if (ascending)
-				bookingMenu.setValue(4, "Ascending");
-			else
-				bookingMenu.setValue(4, "Descending");
-			break;
-		case 5:
-			result.clear();
-			result = Booking::bookingConfirmation(checkIn, checkOut, roomTypeId, sortByDate, ascending);
+			return view;
 			break;
 		}
-
 	}
 
 }
