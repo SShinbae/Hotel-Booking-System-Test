@@ -102,3 +102,29 @@ std::vector<Feedback> Feedback::findFeedback(int user)
 	return products;
 	
 }
+
+std::vector<Feedback> Feedback::findFeedbackAdmin()
+{
+	string query = "SELECT * FROM `feedback`";
+
+	// 
+	DBConnection db;
+
+	db.prepareStatement(query);
+	vector<Feedback> products;
+	db.QueryResult();
+
+	if (db.res->rowsCount() > 0) {
+
+		while (db.res->next()) {
+			Feedback tmpProduct(db.res);
+			products.push_back(tmpProduct);
+
+		}
+	}
+
+	//db.~DBConnection();
+	return products;
+}
+
+	

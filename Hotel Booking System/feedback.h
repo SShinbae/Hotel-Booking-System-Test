@@ -25,7 +25,7 @@ public:
     ~Feedback();
 
     static std::vector<Feedback> findFeedback(int user);
-
+    static std::vector<Feedback> findFeedbackAdmin();
     
     
 };

@@ -1,5 +1,6 @@
 #include "reservation.h"
 #include <string> 
+#include<vector>
 using namespace std;
 
 Reservation::Reservation() {
@@ -64,16 +65,14 @@ void Reservation::insert() {
 
 
 }
-void Reservation::addPax(roomVariety room, int pax)
-{
-	items.push_back({ room,pax });
+void Reservation::addPax(roomVariety room, int pax) {
+	items.push_back({ room, pax }); // Adding an empty check-in date
 }
 
 void Reservation::addRoom(roomVariety room, int quantity) {
-	items.push_back({room,quantity});
-	//items.push_back({ room, pax });
+	items.push_back({ room, quantity }); 
+	
 }
-
 
 double Reservation::total() {
 	double total = 0;

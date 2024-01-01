@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <sstream>
 #include <stdexcept>
+#include <regex>
 
 // advanced
 // include our custom class
@@ -25,12 +26,12 @@ void loginMenu(); // login menu
 
 //admin
 void homeAdmin(Account user);
-void feedbackAdmin(Account user);
+Feedback feedbackAdmin(Account user, Feedback view);
 void bookingAdmin(Account user);
 void roomsAdmin(Account user);
 void addRoomTypeAdmin(Account user);
 void addRoomAdmin(Account user);
-void viewRoomAdmin(Account user);
+roomVariety viewRoomAdmin(Account user, roomVariety newBedroom);
 void searchRoomAdmin(Account user);
 
 //user
@@ -38,6 +39,7 @@ void addFeedBack(Account user);
 void homeUser(Account user);
 void bookingUser(Account user);
 void roomsUser(Account user);
+Reservation roomsUser2(Account user, int roomID, Reservation trolley);
 void feedbackUser(Account user);
 Account profile(Account user);
 Feedback viewFeedback(Account user,  Feedback view);
@@ -54,6 +56,8 @@ bool isNumeric(string input);
 
 // extras
 bool toInteger(string* input, int* valueholder);
+
+bool isValidDate(const std::string& dateStr);
  
 string hiddenInput(string = "");
 string valIC(string="");
@@ -473,6 +477,7 @@ void roomsUser(Account user) {
 	}
 }
 
+
 Reservation roomType(Account user, int rType, Reservation trolley) {
 	vector<roomVariety> roomType;
 	string displayString = "";
@@ -601,42 +606,47 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley)
 	while (1) {
 		switch (productMenu.prompt())
 		{
-		case -1:
-			return trolley;
-			break;
-		case 0:
-			cout << "Insert Quantity :";
-			int qty;
-			cin >> qty;
-			if (qty > 0) {
-				trolley.addRoom(rooms, qty);
-			}
-			_getch();
-			break;
-		case 1:
-			cout << "Insert Pax :";
-			int pax;
-			cin >> pax;
-			if (pax > 0) {
-				trolley.addPax(rooms, pax);
-			}
-			_getch();
-			break;
-		/*case 2:
-			cout << "Check-in Date :";
-			string date;
-			cin >> date;
-			int numericDate = std::stoi(date);
+			case -1:
+				return trolley;
+				break;
+			case 0:
+				cout << "Insert Quantity :";
+				int qty;
+				cin >> qty;
+				if (qty > 0) {
+					trolley.addRoom(rooms, qty);
+				}
+				_getch();
+				break;
+			/*case 1:
+				cout << "Insert Pax :";
+				int pax;
+				cin >> pax;
+				if (pax > 0) {
+					trolley.addPax(rooms, pax);
+				}
+				_getch();
+				break;*/
+			/*case 2:
+				cout << "Insert Check-in Date (DD/MM/YYYY): ";
+				std::string checkInDate;
+				cin >> checkInDate;
 
-			if (numericDate > 0) {
-				trolley.addRoom(rooms, numericDate);
-			}
-			_getch();
-			break;*/
-		case 3:
-			cout << endl << "Product Added into cart";
-			_getch();
-			break;
+				if (!isValidDate(checkInDate))
+				{
+				cout << "Invalid date format. Please use DD/MM/YYYY format." << endl;
+				_getch();
+				}
+				else
+				{
+					trolley.addRoom(rooms, checkInDate);
+				}
+				break;
+				*/
+			case 3:
+				cout << endl << "Product Added into cart";
+				_getch();
+				break;
 		}
 	}
 }
@@ -905,6 +915,8 @@ int productCategorySelection() {
 //admin
 void homeAdmin(Account user) {
 
+	Feedback fBack;
+
 	Menu homeMenus;
 	ArrowMenu homeMenu;
 	homeMenu.addOption("Profile");
@@ -929,14 +941,44 @@ void homeAdmin(Account user) {
 			bookingAdmin(user);
 			break;
 		case 3:
-			feedbackAdmin(user);
+			fBack = feedbackAdmin(user, fBack);
 			break;
 		}
 	}
 }
 
-void feedbackAdmin(Account user) {
+Feedback feedbackAdmin(Account user, Feedback view) {
+	
+	Feedback pengguna;
 
+	vector<Feedback> displayFeedback;
+	displayFeedback = Feedback::findFeedbackAdmin();
+	ArrowMenu cartM;
+	cartM.addOption("Back");
+	stringstream tmpString;
+
+	tmpString << fixed << setprecision(2) << setw(5) << "FID" << "|" << setw(5) << "CID" 
+		<< "|" << setw(40) << "Messages"
+		<< "|" << setw(20) << "Date & Time" << "|" << endl;
+
+	for (int i = 0; i < displayFeedback.size(); i++) {
+		tmpString << setw(5) << displayFeedback[i].feedBackId << "|" << setw(5) << displayFeedback[i].user << "|"
+			<< setw(40) << displayFeedback[i].messages
+			<< "|" << setw(20) << displayFeedback[i].date << "|" << endl;
+	}
+	cartM.header = "Your Feedback " + user.name + "\n" + tmpString.str();
+
+	int option = 0;
+	while (1) {
+
+		option = cartM.prompt(option);
+		switch (option)
+		{
+		case 0:
+			return view;
+			break;
+		}
+	}
 }
 
 void bookingAdmin(Account user) {
@@ -944,7 +986,7 @@ void bookingAdmin(Account user) {
 }
 
 void roomsAdmin(Account user) {
-	Bedroom newBedroom;
+	roomVariety newBedroom;
 
 	ArrowMenu bedroomM;
 	bedroomM.header = "Please Select One";
@@ -967,12 +1009,53 @@ void roomsAdmin(Account user) {
 		case 1:
 			addRoomAdmin(user);
 			break;
-			/*case 2:
-				viewRoom(user):
-				break:*/
-				/*case 2:
-					searchRoom(user);
-					break:*/
+		case 2:
+			newBedroom = viewRoomAdmin(user, newBedroom);
+			break;
+		/*case 3:
+			searchRoom(user);
+			break:*/
+		}
+	}
+}
+
+
+//not yet done//
+roomVariety viewRoomAdmin(Account user, roomVariety newBedroom){
+
+	roomVariety newRoom;
+	vector<roomVariety> dispRoom;
+	dispRoom = roomVariety::findRooms();
+
+	ArrowMenu roomMenu;
+	roomMenu.addOption("Back ");
+
+	//Display
+	stringstream tmpAdmin;
+	roomMenu.display();
+	tmpAdmin << fixed << setprecision(2) << setw(5) << "RoomID" << "|" << setw(10) << "Room Type"
+		<< "|" << setw(20) << "name" << "|" << setw(20) << "Availability" 
+		<< "|" << setw(20) << "Price" << endl;
+
+	for (int i = 0; i < dispRoom.size(); i++) {
+		tmpAdmin << setw(5) << dispRoom[i].roomID << "|" << setw(10)
+			<< dispRoom[i].rType << "|" << setw(20)
+			<< dispRoom[i].name << "|" << setw(20)
+			<< dispRoom[i].availability
+			<< "|" << setw(20) << dispRoom[i].price << endl;
+	}
+	roomMenu.header = "List of Room at WMA Hotel "  "\n" + tmpAdmin.str();
+	//cartM.header = "Your Feedback " + user.name + "\n" + tmpString.str();
+
+	int option = 0;
+	while (1) {
+
+		option = roomMenu.prompt(option);
+		switch (option) {
+		
+		case 0:
+			return newRoom;
+			break;
 		}
 	}
 }
@@ -997,17 +1080,20 @@ void addRoomTypeAdmin(Account user)
 			return;
 			break;
 		case 0:
-			cout << "Insert Room Type ";
+			cout << "Insert Room Type :";
+			cin.ignore();
 			getline(cin, newRoomType.type);
 			roomAdd.setValue(0, newRoomType.type);
 			break;
 		case 1:
-			cout << "Insert Room Capacity ";
+			cout << "Insert Room Capacity :";
+			cin.ignore();
 			cin >> newRoomType.capacity;
 			roomAdd.setValue(1, std::to_string(newRoomType.capacity));
 			break;
 		case 2:
-			cout << "Insert Room Description ";
+			cout << "Insert Room Description :";
+			cin.ignore();
 			getline(cin, newRoomType.description);
 			roomAdd.setValue(2, newRoomType.description);
 			break;
@@ -1024,9 +1110,12 @@ void addRoomTypeAdmin(Account user)
 
 void addRoomAdmin(Account user)
 {
+	roomVariety nRoom;
 	Bedroom newRoom;
 	vector<Bedroom> displayRoom;
 	displayRoom = Bedroom::findBedroom();
+
+
 
 	ArrowMenu roomMenu;
 
@@ -1035,7 +1124,7 @@ void addRoomAdmin(Account user)
 	roomMenu.addOption("Enter Room Price ");
 	roomMenu.addOption("Enter Availability ");
 	roomMenu.addOption("Submit ");
-	
+
 
 	//Display room type Menu
 	stringstream tmpAdmin;
@@ -1050,7 +1139,7 @@ void addRoomAdmin(Account user)
 	}
 	roomMenu.header = "Please Select ID based on the table"  "\n" + tmpAdmin.str();
 	//cartM.header = "Your Feedback " + user.name + "\n" + tmpString.str();
-	
+
 	int option = 0;
 	while (1) {
 
@@ -1061,28 +1150,29 @@ void addRoomAdmin(Account user)
 			break;
 		case 0:
 			cout << "Insert Room Type ID: ";
-			cin >> newRoom.rType;
-			roomMenu.setValue(0, std::to_string(newRoom.rType));
+			cin >> nRoom.rType;
+			roomMenu.setValue(0, std::to_string(nRoom.rType));
 			break;
 		case 1:
 			cout << "Insert Room Name: ";
 			cin.ignore(); // Add this line to consume the newline character
-			getline(cin, newRoom.name);
-			roomMenu.setValue(1, newRoom.name);
+			getline(cin, nRoom.name);
+			roomMenu.setValue(1, nRoom.name);
 			break;
 		case 2:
 			cout << "Insert Room Price: ";
-			cin >> newRoom.price;
-			roomMenu.setValue(2, std::to_string(newRoom.price));
+			cin.ignore();
+			cin >> nRoom.price;
+			roomMenu.setValue(2, std::to_string(nRoom.price));
 			break;
 		case 3:
 			cout << "Insert Room Availability (YES OR NO): ";
 			cin.ignore();
-			getline(cin, newRoom.description);
-			roomMenu.setValue(3, newRoom.description);
+			getline(cin, nRoom.availability);
+			roomMenu.setValue(3, nRoom.availability);
 			break;
 		case 4:
-			newRoom.insertR();
+			nRoom.insertR();
 			cout << "Submit";
 			_getch();
 			return;
@@ -1094,9 +1184,12 @@ void addRoomAdmin(Account user)
 
 
 
-
-
-
+bool isValidDate(const std::string& dateStr)
+{
+	std::regex dateRegex
+	("^[0,1]?\\d{1}/(([0-2]?\\d{1})|([3][0,1]{1}))/(([1]{1}[9]{1}\\d{1})|([2-9]{1}\\d{3}))$");
+	return std::regex_match(dateStr, dateRegex);
+}
 
 bool isNumeric(string input) {
 	for (int i = 0; i < input.length(); i++) {

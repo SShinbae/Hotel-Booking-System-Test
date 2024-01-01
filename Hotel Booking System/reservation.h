@@ -13,6 +13,7 @@ public:
 	std::string dateTime, checkInDate, checkOutDate;
 	int reservationID, user, pax;
 	
+	
 
 	std::vector<std::pair<roomVariety,int>> items; // pair of product and its quantity, represents the transaction_item table
 
@@ -22,6 +23,8 @@ public:
 	void insert();
 	double total();
 	int count();
+
+
 };
 
 

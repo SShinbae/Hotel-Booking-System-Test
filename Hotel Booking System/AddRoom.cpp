@@ -1,5 +1,6 @@
 #include "AddRoom.h"
-#include "DBConnect.h" 
+#include <vector>
+#include <iomanip>
 using namespace std;
 
 Bedroom::Bedroom() {
@@ -8,28 +9,18 @@ Bedroom::Bedroom() {
 	capacity = 0;
 	type = "";
 	description = "";
-	//room
-	rType = 0;
-	roomID = 0;
-	name = "";
-	price = "";
-	availability = "";
+	
 }
 
 
-Bedroom::Bedroom(int roomtypeID, int capacity, std::string type, std::string description, int roomID, int rType, std::string name, std::string availbility, bool price)
+Bedroom::Bedroom(int roomtypeID, int capacity, std::string type, std::string description)
 {
 	//roomType
 	this->roomtypeID = roomtypeID;
 	this->capacity = capacity;
 	this->type = type;
 	this->description = description;
-	//room
-	this->rType = rType;
-	this->roomID = roomID;
-	this->name = name;
-	this->price = price;
-	this->availability = availability;
+	
 }
 //display room types
 Bedroom::Bedroom(sql::ResultSet* data) {
@@ -37,6 +28,7 @@ Bedroom::Bedroom(sql::ResultSet* data) {
 	capacity = data->getInt("capacity");
 	type = data->getString("type");
 	description = data->getString("description");
+	
 
 }
 
@@ -58,43 +50,23 @@ void Bedroom::insertRT() {
 	
 }
 
-void Bedroom::insertR() {
-	DBConnection db;//instantiate
-	try {
-		db.prepareStatement("INSERT INTO room (rType, name, availability, price) VALUES (?,?,?,?)");
-		
-		db.stmt->setInt(1, rType);
-		db.stmt->setString(2, name);
-		db.stmt->setString(3, availability);
-		db.stmt->setInt(4, price);
-		db.QueryStatement();
-
-	}
-	catch (std::exception& e) {
-		std::cerr << "Error inserting into the database: " << e.what() << std::endl;
-		// Handle the error as needed (e.g., log, display an error message)
-	}
-}
-
 Bedroom::~Bedroom()
 {
 
 }
 
+
+
+
 std::vector<Bedroom> Bedroom::findBedroom()
 {
 	string query = "SELECT * FROM `roomtypes` ";
-
-	// 
 	DBConnection db;
 
 	db.prepareStatement(query);
+	vector<Bedroom> roomA;
 	db.QueryResult();
 	
-
-	vector<Bedroom> roomA;
-
-	db.QueryResult();
 
 	if (db.res->rowsCount() > 0) {
 
@@ -105,7 +77,7 @@ std::vector<Bedroom> Bedroom::findBedroom()
 		}
 	}
 
-	//db.~DBConnection();
+	db.~DBConnection();
 	return roomA;
 
 	

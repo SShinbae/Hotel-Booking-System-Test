@@ -8,7 +8,7 @@ roomVariety::roomVariety() {
 	rType = 0;
 	price = 0;
 	availability = "";
-	pax = 0;
+	//pax = 0;
 }
 
 roomVariety::roomVariety(sql::ResultSet* data) {
@@ -59,6 +59,24 @@ vector<roomVariety> roomVariety::findRoom(int rType,string keyword, double minPr
 	return rooms;
 }
 
+void roomVariety::insertR()
+{
+	DBConnection db;//instantiate
+	try {
+		db.prepareStatement("INSERT INTO room (rType, name, price, availability) VALUES (?,?,?,?)");
+		db.stmt->setInt(1, rType);
+		db.stmt->setString(2, name);
+		db.stmt->setDouble(3, price);
+		db.stmt->setString(4, availability);
+		db.QueryStatement();
+
+	}
+	catch (std::exception& e) {
+		std::cerr << "Error inserting into the database: " << e.what() << std::endl;
+		// Handle the error as needed (e.g., log, display an error message)
+	}
+}
+
 
 roomVariety roomVariety::findRoom(int roomID) {
 	DBConnection db;
@@ -75,6 +93,35 @@ roomVariety roomVariety::findRoom(int roomID) {
 	}
 	db.~DBConnection();
 	return result;
+}
+
+std::vector<roomVariety> roomVariety::findRooms()
+{
+
+	string querys = "SELECT * FROM `room` ";
+
+	// 
+	DBConnection db;
+
+	db.prepareStatement(querys);
+
+	vector<roomVariety> roomDisp;
+
+	db.QueryResult();
+
+	if (db.res->rowsCount() > 0) {
+
+		while (db.res->next()) {
+			roomVariety tempRoom(db.res);
+			roomDisp.push_back(tempRoom);
+
+		}
+	}
+
+	db.~DBConnection();
+	return roomDisp;
+
+
 }
 
 roomVariety::~roomVariety() {
