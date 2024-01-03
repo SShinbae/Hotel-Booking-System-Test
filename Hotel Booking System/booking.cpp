@@ -1,4 +1,5 @@
 #include "booking.h"
+#include "Room.h"
 using namespace std;
 using namespace sql;
 
@@ -13,7 +14,7 @@ Booking::Booking(ResultSet* data) {
 	quantity = data->getInt("quantity");
 	checkInDate = data->getString("checkInDate");
 	checkOutDate = data->getString("checkOutDate");
-	roomName = data->getString("roomType");
+	roomName = data->getString("roomName");
 	pax = data->getInt("pax");
 	price = data->getInt("price");
 }
@@ -42,7 +43,7 @@ void Booking::insert() {
 
 	DBConnection db;//instantiate
 	try {
-		db.prepareStatement("INSERT INTO booking (rID, user, quantity, checkInDate, checkOutDate, roomName, pax, price) VALUES (?,?,?,?,?,?,?)");
+		db.prepareStatement("INSERT INTO booking (rID, user, quantity,pax, checkInDate, checkOutDate, roomName, price) VALUES (?,?,?,?,?,?,?,?)");
 		
 		db.stmt->setInt(1, rID);
 		db.stmt->setInt(2, user);
@@ -62,17 +63,23 @@ void Booking::insert() {
 
 }
 
+//std::vector<int> paxValues;
+
 std::vector<Booking> Booking::findBookingAdmin()
 {
 	return std::vector<Booking>();
 }
 
+
+
+
 std::vector<Booking> Booking::findBooking(int user)
 {
-	string query = "SELECT * FROM `booking` ";
+	string query = "SELECT * FROM `booking` WHERE user = ? ";
 	DBConnection db;
 
 	db.prepareStatement(query);
+	db.stmt->setInt(1, user);
 	vector<Booking> roomA;
 	db.QueryResult();
 

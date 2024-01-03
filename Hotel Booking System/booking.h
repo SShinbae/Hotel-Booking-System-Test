@@ -4,7 +4,10 @@
 
 #include <string>
 #include <vector>
+#include <utility>
+#include <iostream>
 #include "DBConnect.h"
+#include "Room.h"
 
 class Booking
 {
@@ -25,7 +28,6 @@ public:
 
 	static std::vector<Booking> findBooking(int user);
 	std::vector<Booking> findBookingAdmin();
-
 
 	~Booking() {
 

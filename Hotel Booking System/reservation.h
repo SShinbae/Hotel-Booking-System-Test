@@ -18,8 +18,7 @@ public:
 	std::vector<std::pair<roomVariety,int>> items; // pair of product and its quantity, represents the transaction_item table
 
 	Reservation();
-	void addPax(roomVariety room,int pax);
-	void addRoom(roomVariety room, int quantity);
+	void addQuantity(roomVariety room, int quantity, int pax, std::string checkInDate, std::string checkOutDate);
 	void insert();
 	double total();
 	int count();

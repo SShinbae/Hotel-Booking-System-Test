@@ -38,7 +38,7 @@ void searchRoomAdmin(Account user);
 void addFeedBack(Account user);
 void homeUser(Account user);
 Booking bookingUser(Account user, Booking view);
-Bedroom roomsUser(Account user, Reservation trolley);
+void roomsUser(Account user);
 Reservation roomsUser2(Account user, int roomID, Reservation trolley);
 void feedbackUser(Account user);
 Account profile(Account user);
@@ -280,7 +280,7 @@ void homeUser(Account user) {
 			user = profile(user);
 			break;
 		case 1:
-			vRoom = roomsUser(user, vRoom2);
+			roomsUser(user);
 			break;
 		case 2:
 			vBack = bookingUser(user, vBack);
@@ -445,49 +445,38 @@ Account profile(Account user) {
 	}
 }
 
-Bedroom roomsUser(Account user, Reservation trolley) {
+void roomsUser(Account user) {
 
-	vector<Bedroom> rumah;
+	Reservation cart; //initialize a transaction to hold product values
+	cart.user = user.userId; // put currently logged in user id into the transaction
 
-	ArrowMenu roomMenu;
-	roomMenu.footer = "WMA HOTEL";
-	roomMenu.bullet = "";
-	roomMenu.header = "Please Select Room Type " + user.name;
-	
-	ArrowMenu productSelect;
-	productSelect.bullet = ""; //we dont want bullet here
-	
-	int selectedProduct = 0;
-	rumah = Bedroom::findBedroom();
-	roomMenu.clearOption();
-	stringstream tmpString;
-	tmpString << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(10) << "Type" << "|"
-		<< setw(10) << "Description"
-		<< "|" << setw(5) << "Capacity" << "|" << endl;
-
-	roomMenu.header = tmpString.str();
-	tmpString.str("");
-	for (int i = 0; i < rumah.size(); i++) {
-		tmpString << fixed << setw(10) << rumah[i].roomtypeID << "|" 
-			<< setw(10) << rumah[i].type << "|" << setw(20) << rumah[i].description
-			<< "|" << setw(5) << rumah[i].capacity << "|" << endl;
-		roomMenu.addOption(tmpString.str());
-		tmpString.str("");
-
-	}
-	
+	ArrowMenu shopMenu;
+	shopMenu.footer = "Select Room Type";
+	shopMenu.addOption("Master Bedroom");
+	shopMenu.addOption("Queen Bedroom");
+	shopMenu.addOption("Single Bedroom");
+	shopMenu.addOption("View Cart");
 	while (1) {
-		
-		selectedProduct = roomMenu.prompt(selectedProduct);
-		if (selectedProduct != -1) { // if not escape pressed process it
-			trolley = roomDetails(user, rumah[selectedProduct].roomtypeID, trolley);
-		}
-		else {
-			return 0;
+		//shopMenu.header = "Items in cart:" + to_string(cart.count()) + "  \nTotal Price: " + to_string(cart.total());
+		switch (shopMenu.prompt())
+		{
+		case -1:
+			return;
+			break;
+		case 0:
+			cart = roomType(user, 1, cart);
+			break;
+		case 1:
+			cart = roomType(user, 2, cart);
+			break;
+		case 2:
+			cart = roomType(user, 3, cart);
+			break;
+		case 3:
+			cart = trolleyMenu(user, cart);
 			break;
 		}
 	}
-	return 0;
 }
 
 
@@ -597,83 +586,74 @@ Reservation roomType(Account user, int rType, Reservation trolley) {
 
 }
 
-Reservation roomDetails(Account user, int roomID, Reservation trolley)
-{
+Reservation roomDetails(Account user, int roomID, Reservation trolley) {
 	roomVariety rooms = roomVariety::findRoom(roomID);
 	if (rooms.roomID == 0) {
-		// default id, which mean product doesn't exist since no 0 id in database
+		// default id, which means the product doesn't exist since there is no 0 id in the database
 		cout << "Product not found";
 		_getch();
 		return trolley;
 	}
 
 	ArrowMenu productMenu;
-	productMenu.addOption("Add Quantity");
-	productMenu.addOption("Add Pax");
-	productMenu.addOption("Check-in Date");
-	productMenu.addOption("Add to cart");
+	productMenu.addOption("Add to Trolley ");
 	productMenu.header = "Product Details:\n"
 		"\nName\t: " + rooms.name
 		+ "\nAvailable\t: " + rooms.availability
 		+ "\nPrice\t: " + to_string(rooms.price);
-	while (1) {
-		switch (productMenu.prompt())
-		{
-			case -1:
-				return trolley;
-				break;
-			case 0:
-				cout << "Insert Quantity :";
-				int qty;
-				cin >> qty;
-				if (qty > 0) {
-					trolley.addRoom(rooms, qty);
-				}
-				_getch();
-				break;
-			/*case 1:
-				cout << "Insert Pax :";
-				int pax;
-				cin >> pax;
-				if (pax > 0) {
-					trolley.addPax(rooms, pax);
-				}
-				_getch();
-				break;*/
-			/*case 2:
-				cout << "Insert Check-in Date (DD/MM/YYYY): ";
-				std::string checkInDate;
-				cin >> checkInDate;
 
-				if (!isValidDate(checkInDate))
-				{
-				cout << "Invalid date format. Please use DD/MM/YYYY format." << endl;
-				_getch();
-				}
-				else
-				{
-					trolley.addRoom(rooms, checkInDate);
-				}
-				break;
-				*/
-			case 3:
-				cout << endl << "Product Added into cart";
-				_getch();
-				break;
+	while (1) {
+		switch (productMenu.prompt()) {
+		case -1: {
+			return trolley;
+		}
+		break;
+		case 0: {
+			int qty,pax;			
+			std::string checkInDate, checkOutDate; // Declare checkOutDate within a block
+
+			cout << "Insert Quantity: ";
+			cin >> qty;
+			if (qty == 0 || qty < 0) {
+				cout << "Quantity must not be 0";
+				
+			}
+			
+			cout << "Insert Pax: ";
+			cin >> pax;
+			if (pax == 0 || pax < 0) {
+				cout << "Pax must not be 0";
+
+			}
+			
+			cout << "Insert Check-In Date (YYYY-MM-DD): ";
+			cin >> checkInDate;
+			cout << "Insert Check-Out Date (YYYY-MM-DD): ";
+			cin >> checkOutDate;
+
+			trolley.addQuantity(rooms, qty, pax, checkInDate, checkOutDate);
+			_getch();
+			break;
+		}
 		}
 	}
 }
 
 Reservation trolleyMenu(Account user, Reservation trolley) {
+	Reservation newUser;
+	newUser.user = user.userId;
 	ArrowMenu trolleyM;
 	trolleyM.addOption("Checkout");
 	trolleyM.addOption("Empty Cart");
 	stringstream ss;
-	ss << fixed << setprecision(2) << setw(20) << "Product|" << setw(20) << "Price|" << setw(20)
-		<< "Quantity|" << setw(20) << "Subtotal|" << endl;
+	ss << fixed << setprecision(2) << setw(20) << "Room Name|" << setw(20) << "Price|" << setw(20)
+		<< "Quantity|" <<  setw(20) << "Pax|" << setw(20) << "Check In Date|" << setw(20) 
+		<< "Check Out Date|" << setw(20) << "Subtotal|" << endl;
 	for (int i = 0; i < trolley.items.size(); i++) {
-		ss << setw(20) << trolley.items[i].first.name << setw(20) << trolley.items[i].first.price << setw(20)
-			<< trolley.items[i].second << setw(20) << (trolley.items[i].first.price * trolley.items[i].second) << endl;
+		ss << setw(20) << trolley.items[i].first.name << setw(20) << trolley.items[i].first.price 
+			<< setw(20)<< trolley.items[i].second << setw(20) << trolley.items[i].first.pax
+			<< setw(20) << trolley.items[i].first.checkInDate << setw(20) << trolley.items[i].first.checkOutDate
+			<< setw(20) << (trolley.items[i].first.price * trolley.items[i].second) << endl;
 	}
 	ss << setw(20) << "SUM" << setw(20) << "" << setw(20) << trolley.count() << setw(20) << trolley.total();
 	trolleyM.header = "Trolley Items\n" + ss.str();

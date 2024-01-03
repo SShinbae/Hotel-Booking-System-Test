@@ -8,7 +8,9 @@ roomVariety::roomVariety() {
 	rType = 0;
 	price = 0;
 	availability = "";
+	quantity = 0;
 	//pax = 0;
+	//user = 0;
 }
 
 roomVariety::roomVariety(sql::ResultSet* data) {
@@ -17,6 +19,7 @@ roomVariety::roomVariety(sql::ResultSet* data) {
 	rType = data->getInt("rType");
 	price = data->getDouble("price");
 	availability = data->getString("availability");
+	//user = data->getInt("user");
 	//category = data->getInt("category");
 }
 
