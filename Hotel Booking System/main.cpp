@@ -3,9 +3,12 @@
 #include <iostream>  
 #include <conio.h>
 #include <iomanip>
+#include <chrono>
 #include <sstream>
 #include <stdexcept>
 #include <regex>
+#include <cctype>
+#include <algorithm>
 
 // advanced
 // include our custom class
@@ -39,7 +42,6 @@ void addFeedBack(Account user);
 void homeUser(Account user);
 Booking bookingUser(Account user, Booking view);
 void roomsUser(Account user);
-Reservation roomsUser2(Account user, int roomID, Reservation trolley);
 void feedbackUser(Account user);
 Account profile(Account user);
 Feedback viewFeedback(Account user,  Feedback view);
@@ -47,16 +49,12 @@ Reservation roomType(Account user, int rType, Reservation trolley);
 Reservation roomDetails(Account user, int roomID, Reservation trolley);
 Reservation trolleyMenu(Account user, Reservation trolley);
 
-
-int productCategorySelection();
-
-
 //utility functions
 bool isNumeric(string input);
 
 // extras
 bool toInteger(string* input, int* valueholder);
-
+//validate user input date
 bool isValidDate(const std::string& dateStr);
  
 string hiddenInput(string = "");
@@ -94,7 +92,7 @@ void registerAccount() {
 	newacc.setUsertype("user");
 
 	ArrowMenu rgMenu;
-	rgMenu.header = "Registration";
+	rgMenu.header = "Hi, Welcome. This is Registration Form for WMA Hotel";
 	rgMenu.addOption("Name");
 	rgMenu.addOption("Number IC");
 	rgMenu.addOption("Phone Number ");
@@ -128,53 +126,90 @@ void registerAccount() {
 		case -1:
 			return;
 
-		case 0:
-			cout << "Insert Name:";
+		case 0: {
+			cout << "Insert Name (alphabets only):  ";
 			getline(cin, newacc.name);
-			rgMenu.setValue(0, newacc.name);
-			break;
-		case 1:
-			cout << "Insert Number IC (991012110212):";
-			cin >> newacc.numIc;
-			if (newacc.numIc.length() > 12 || newacc.numIc.length() < 12) {
-				cout << "Number IC must be 12 character";
-				_getch();
+			// Check if the name is not empty and contains only alphabets and spaces
+			if (!newacc.name.empty() && newacc.name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ") == std::string::npos) {
+				rgMenu.setValue(0, newacc.name);
 			}
 			else {
-				rgMenu.setValue(1, newacc.numIc);;
+				cout << "Invalid name. Please use alphabets and spaces only.\n";
+				_getch();
 			}
 			break;
+		}
+		case 1: {
+			cout << "Insert Number IC (991012110212):";
+			cin >> newacc.numIc;
+			// Check if the IC number is exactly 12 characters and contains only digits
+			if (newacc.numIc.length() == 12 && newacc.numIc.find_first_not_of("0123456789") == std::string::npos) {
+				rgMenu.setValue(1, newacc.numIc);
+			}
+			else {
+				cout << "Number IC must be 12 characters and contain only digits.\n";
+				_getch();
+			}
+			break;
+		}
 		case 2:
 			cout << "Insert Phone Number (0131234560):";
 			cin >> newacc.phoneNum;
-			if (newacc.phoneNum.length() > 11 || newacc.phoneNum.length() < 10) {
+			if (newacc.phoneNum.length() == 11 || newacc.phoneNum.length() == 10) {
+			
+				rgMenu.setValue(2, newacc.phoneNum);
+			}
+			else {
 				cout << "Phone Number must be at least 10 or 11 number";
 				_getch();
 			}
+			break;
+		case 3: {
+			cout << "Insert email (example@gmail.com):";
+			getline(cin, newacc.email);
+			// Simple regex to validate email
+			std::regex emailRegex(R"(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)");
+			if (std::regex_match(newacc.email, emailRegex)) {
+				rgMenu.setValue(3, newacc.email);
+			}
 			else {
-				rgMenu.setValue(2, newacc.phoneNum);;
+				cout << "Invalid email format. Please try again.\n";
+				_getch();
 			}
 			break;
-		case 3:
-			cout << "Insert email (utem@gmail.com):";
-			getline(cin,newacc.email);
-			rgMenu.setValue(3, newacc.email);
-			break;
-		case 4:
+		}
+		case 4: {
 			cout << "Insert Address:";
-			getline(cin,newacc.address);
-			rgMenu.setValue(4, newacc.address);
+			getline(cin, newacc.address);
+			// Check if the address is not empty
+			if (!newacc.address.empty()) {
+				rgMenu.setValue(4, newacc.address);
+			}
+			else {
+				cout << "Address cannot be empty. Please try again.\n";
+				_getch();
+			}
 			break;
-		case 5:
+		}
+		
+		case 5: 
 			cout << "Insert Username:";
 			cin >> newacc.username;
-			rgMenu.setValue(5, newacc.username);
+			// Check for username length or any other specific criteria
+			if (newacc.username.length() >= 4) { // Example: usernames should be at least 4 characters long
+				rgMenu.setValue(5, newacc.username);
+			}
+			else {
+				cout << "Username must be at least 4 characters long. Please try again.\n";
+				_getch();
+			}
 			break;
+		
 		case 6:
 			cout << "Insert password:";
 			tmpinput = hiddenInput(tmpinput);
 			if (tmpinput.length() < 6) {
-				cout << "Password must be at least 6 character long";
+				cout << "\nPassword must be at least 6 character long";
 				_getch();
 			}
 			else {
@@ -203,9 +238,10 @@ void registerAccount() {
 		}
 	}
 }
+
 void loginMenu() {
 	ArrowMenu loginMenu;
-	loginMenu.header = "LOGIN";
+	loginMenu.header = "WMA Hotel Login\n ";
 	loginMenu.addOption("username");
 	loginMenu.addOption("password");
 	loginMenu.addOption("Login"); 
@@ -256,6 +292,8 @@ void loginMenu() {
 		}
 	}
 }
+
+//User 
 void homeUser(Account user) {
 
 	Booking vBack;
@@ -270,7 +308,7 @@ void homeUser(Account user) {
 	homeMenu.addOption("Feedback");
 	//homeMenu.addOption("Logout");
 	while (1) {
-		homeMenu.header = "Welcome " + user.name;
+		homeMenu.header = "Welcome " + user.name + " to WMA Hotel";
 		switch (homeMenu.prompt())
 		{
 		case -1:
@@ -292,44 +330,12 @@ void homeUser(Account user) {
 	}
 }
 
-Feedback viewFeedback(Account user, Feedback view){
-	Feedback pengguna;
-	pengguna.user = user.userId;
-
-	vector<Feedback> displayFeedback;
-	displayFeedback = Feedback::findFeedback(pengguna.user);
-	ArrowMenu cartM;
-	cartM.addOption("Back");
-	stringstream tmpString;
-
-	tmpString << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(40) << "Messages"
-		<< "|" << setw(20) << "Date & Time" << endl;
-
-	for (int i = 0; i < displayFeedback.size(); i++) {
-		tmpString << setw(5) << displayFeedback[i].feedBackId << "|" << setw(40) << displayFeedback[i].messages
-			<< "|" << setw(10) << displayFeedback[i].date << endl;
-	}
-	cartM.header = "Your Feedback " +user.name +"\n" + tmpString.str() ;
-
-	int option = 0;
-	while (1) {
-		
-		option = cartM.prompt(option);
-		switch (option)
-		{
-		case 0:
-			return view ;
-			break;
-		}
-	}
-}
-
 Account profile(Account user) {
 
 	Account temp = user; // copy the object
 
 	ArrowMenu profileMenu;
-	profileMenu.header = "Your profile";
+	profileMenu.header = user.name + ", This is your profile";
 	profileMenu.addOption("Name");
 	profileMenu.addOption("Number IC");
 	profileMenu.addOption("Phone Number ");
@@ -361,43 +367,71 @@ Account profile(Account user) {
 			break;
 		case 0:
 			cout << "Insert Name:";
-			getline(cin,temp.name);
+			getline(cin, temp.name);
+			if (temp.name.empty()) {
+				cout << "Name cannot be empty. Please try again.\n";
+				_getch();
+			}
+			else {
+				profileMenu.setValue(0, temp.name);
+			}
 			break;
 		case 1:
 			cout << "Insert Number IC (991012110212):";
 			cin >> temp.numIc;
-			if (temp.numIc.length() == 12) {
+			if (temp.numIc.length() == 12 && all_of(temp.numIc.begin(), temp.numIc.end(), ::isdigit)) {
 				profileMenu.setValue(1, temp.numIc);
 			}
 			else {
-				temp.numIc.length() > 12 || temp.numIc.length() < 12;
-				cout << "Number IC must be 12 character";
+				cout << "Number IC must be 12 characters long and contain only digits.\n";
 				_getch();
 			}
 			break;
 		case 2:
 			cout << "Insert Phone Number (0131234560):";
 			cin >> temp.phoneNum;
-			if (temp.phoneNum.length() > 11 || temp.phoneNum.length() < 10) {
-				cout << "Phone Number must be at least 10 or 11 number";
-				_getch;
-			}
-			else {
+			if ((temp.phoneNum.length() == 10 || temp.phoneNum.length() == 11) && all_of(temp.phoneNum.begin(), temp.phoneNum.end(), ::isdigit)) {
 				profileMenu.setValue(2, temp.phoneNum);
 			}
+			else {
+				cout << "Phone Number must be 10 or 11 digits long.\n";
+				_getch();
+			}
 			break;
-		case 3:
-			cout << "Insert email (utem@gmail.com):";
-			getline(cin,temp.email);
+		case 3: {
+			cout << "Insert email (example@gmail.com):";
+			getline(cin, temp.email);
+			std::regex emailRegex(R"(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)");
+			if (std::regex_match(temp.email, emailRegex)) {
+				profileMenu.setValue(3, temp.email);
+			}
+			else {
+				cout << "Invalid email format. Please try again.\n";
+				_getch();
+			}
 			break;
+		}
 		case 4:
 			cout << "Insert Address:";
-			getline(cin,temp.address);
+			getline(cin, temp.address);
+			if (temp.address.empty()) {
+				cout << "Address cannot be empty. Please try again.\n";
+				_getch();
+			}
+			else {
+				profileMenu.setValue(4, temp.address);
+			}
 			break;
 		case 5:
 			cout << "Insert Username:";
 			cin >> temp.username;
-			//profileMenu.setValue(5, temp.username);
+			if (temp.username.length() >= 4) { // Example: usernames should be at least 4 characters long
+				profileMenu.setValue(5, temp.username);
+			}
+			else {
+				cout << "Username must be at least 4 characters long. Please try again.\n";
+				_getch();
+			}
 			break;
 		case 6:
 			cout << "Insert current Password:";
@@ -438,7 +472,7 @@ Account profile(Account user) {
 			if (confirm == 'Y' || confirm == 'y') {
 				user = temp;
 				user.remove();
-				main();
+				loginMenu();
 			}
 			break;
 		}
@@ -457,7 +491,7 @@ void roomsUser(Account user) {
 	shopMenu.addOption("Single Bedroom");
 	shopMenu.addOption("View Cart");
 	while (1) {
-		//shopMenu.header = "Items in cart:" + to_string(cart.count()) + "  \nTotal Price: " + to_string(cart.total());
+		shopMenu.header = "Items in cart:" + to_string(cart.count()) + "  \nTotal Price: " + to_string(cart.total());
 		switch (shopMenu.prompt())
 		{
 		case -1:
@@ -478,7 +512,6 @@ void roomsUser(Account user) {
 		}
 	}
 }
-
 
 Reservation roomType(Account user, int rType, Reservation trolley) {
 	vector<roomVariety> roomType;
@@ -607,34 +640,54 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley) {
 		case -1: {
 			return trolley;
 		}
-		break;
+			   break;
 		case 0: {
-			int qty,pax;			
-			std::string checkInDate, checkOutDate; // Declare checkOutDate within a block
+			int qty, pax;
+			std::string checkInDate, checkOutDate;
 
-			cout << "Insert Quantity: ";
-			cin >> qty;
-			if (qty == 0 || qty < 0) {
-				cout << "Quantity must not be 0";
-				
+			while (true) {
+				cout << "Insert Quantity: ";
+				cin >> qty;
+				if (qty > 0) {
+					break; // valid quantity
+				}
+				else {
+					cout << "Quantity must be greater than 0. Please try again.\n";
+				}
 			}
-			
-			cout << "Insert Pax: ";
-			cin >> pax;
-			if (pax == 0 || pax < 0) {
-				cout << "Pax must not be 0";
 
+			while (true) {
+				cout << "Insert Pax: ";
+				cin >> pax;
+				if (pax > 0) {
+					break; // valid pax
+				}
+				else {
+					cout << "Pax must be greater than 0. Please try again.\n";
+				}
 			}
-			
-			cout << "Insert Check-In Date (YYYY-MM-DD): ";
-			cin >> checkInDate;
-			cout << "Insert Check-Out Date (YYYY-MM-DD): ";
-			cin >> checkOutDate;
 
+			while (true) {
+				cout << "Insert Check-In Date (YYYY-MM-DD): ";
+				cin >> checkInDate;
+				cout << "Insert Check-Out Date (YYYY-MM-DD): ";
+				cin >> checkOutDate;
+
+
+				// Date validation logic (pseudo-code)
+				if (isValidDate(checkInDate) && isValidDate(checkOutDate) && trolley.isCheckOutAfterCheckIn(checkInDate, checkOutDate)) {
+					break; // valid dates
+				}
+				else {
+					cout << "Invalid dates. Please enter valid Check-In and Check-Out dates.\n";
+				}
+			}
+			cout << "Add to Cart";
 			trolley.addQuantity(rooms, qty, pax, checkInDate, checkOutDate);
 			_getch();
 			break;
 		}
+
 		}
 	}
 }
@@ -722,6 +775,38 @@ void feedbackUser(Account user)
 	}
 }
 
+Feedback viewFeedback(Account user, Feedback view) {
+	Feedback pengguna;
+	pengguna.user = user.userId;
+
+	vector<Feedback> displayFeedback;
+	displayFeedback = Feedback::findFeedback(pengguna.user);
+	ArrowMenu cartM;
+	cartM.addOption("Back");
+	stringstream tmpString;
+
+	tmpString << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(40) << "Messages"
+		<< "|" << setw(20) << "Date & Time" << endl;
+
+	for (int i = 0; i < displayFeedback.size(); i++) {
+		tmpString << setw(5) << displayFeedback[i].feedBackId << "|" << setw(40) << displayFeedback[i].messages
+			<< "|" << setw(10) << displayFeedback[i].date << endl;
+	}
+	cartM.header = "Your Feedback " + user.name + "\n" + tmpString.str();
+
+	int option = 0;
+	while (1) {
+
+		option = cartM.prompt(option);
+		switch (option)
+		{
+		case 0:
+			return view;
+			break;
+		}
+	}
+}
+
 void addFeedBack(Account user) {
 
 	Feedback newFeed;
@@ -783,7 +868,7 @@ Booking bookingUser(Account user, Booking view) {
 			<< setw(15) << displayBooking[i].checkOutDate << "|" 
 			<< setw(10) << displayBooking[i].price << "|" << endl;
 	}
-	cartM.header = "Your Booking " + user.name + "\n" + tmpString.str();
+	cartM.header = "Your Booking, " + user.name + "\n" + tmpString.str();
 
 	int option = 0;
 	while (1) {
@@ -799,22 +884,7 @@ Booking bookingUser(Account user, Booking view) {
 
 }
 
-int productCategorySelection() {
-	Menu categoryMnu;
-	categoryMnu.header = "TOGGLE CATEGORY";
-	categoryMnu.addOption("Master Bedroom");
-	categoryMnu.addOption("Queen Bedroom");
-	categoryMnu.addOption("SIngle Bedroom");
-	while (1)
-	{
-		//since the selected option starts from 1
-		// and our category id also is 1:apparel, 2:Food, 3:Furniture
-		// we can just use the value of the prompt
-		// if your database id and the prompt result does not match you might need to modify the return value first
-		return categoryMnu.prompt();
 
-	}
-}
 
 //admin
 void homeAdmin(Account user) {
@@ -1086,14 +1156,27 @@ void addRoomAdmin(Account user)
 	}
 }
 
+// Helper function to parse date string to time_point
+std::chrono::system_clock::time_point parseDate(const std::string& dateStr) {
+	std::istringstream ss(dateStr);
+	std::tm dt = {};
+	ss >> std::get_time(&dt, "%Y-%m-%d"); // Assuming date format is YYYY-MM-DD
+	return std::chrono::system_clock::from_time_t(std::mktime(&dt));
+}
 
-
-bool isValidDate(const std::string& dateStr)
+// Function to check if check-out date is after check-in date
+bool Reservation::isCheckOutAfterCheckIn(const std::string& checkInDate, const std::string& checkOutDate)
 {
-	std::regex dateRegex
-	("^[0,1]?\\d{1}/(([0-2]?\\d{1})|([3][0,1]{1}))/(([1]{1}[9]{1}\\d{1})|([2-9]{1}\\d{3}))$");
+	auto checkIn = parseDate(checkInDate);
+	auto checkOut = parseDate(checkOutDate);
+	return checkOut > checkIn;
+}
+
+bool isValidDate(const std::string& dateStr) {
+	std::regex dateRegex("^\\d{4}-\\d{2}-\\d{2}$"); // Simplified regex for "YYYY-MM-DD"
 	return std::regex_match(dateStr, dateRegex);
 }
+
 
 bool isNumeric(string input) {
 	for (int i = 0; i < input.length(); i++) {

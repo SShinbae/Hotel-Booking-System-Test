@@ -1,6 +1,9 @@
 #include "reservation.h"
 #include <string> 
 #include<vector>
+#include <chrono>
+#include <sstream>
+#include <iomanip>
 using namespace std;
 
 Reservation::Reservation() {
@@ -63,6 +66,8 @@ void Reservation::addQuantity(roomVariety room, int quantity, int pax, std::stri
 }
 
 
+
+
 double Reservation::total() {
 	double total = 0;
 	for (int i = 0; i < items.size(); i++) {
@@ -78,3 +83,5 @@ int Reservation::count() {
 	}
 	return count;
 }
+
+

@@ -23,7 +23,7 @@ public:
 	double total();
 	int count();
 
-
+	bool isCheckOutAfterCheckIn(const std::string& checkInDate, const std::string& checkOutDate);
 };
 
 
