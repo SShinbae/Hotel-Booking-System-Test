@@ -30,12 +30,13 @@ void loginMenu(); // login menu
 //admin
 void homeAdmin(Account user);
 Feedback feedbackAdmin(Account user, Feedback view);
-void bookingAdmin(Account user);
+//void bookingAdmin(Account user);
 void roomsAdmin(Account user);
 void addRoomTypeAdmin(Account user);
 void addRoomAdmin(Account user);
-roomVariety viewRoomAdmin(Account user, roomVariety newBedroom);
-void searchRoomAdmin(Account user);
+roomVariety viewRoomAdmin(Account user, roomVariety newBedroom); 
+Booking bookingAdmin(Account user, Booking view);
+//void searchRoomAdmin(Account user);
 
 //user
 void addFeedBack(Account user);
@@ -725,14 +726,14 @@ Reservation trolleyMenu(Account user, Reservation trolley) {
 				trolley.insert();
 				cout << "Booking Confirm";
 				_getch();
-				roomVariety(user); // go back to shop with empty cart
+				homeUser(user); // go back to shop with empty cart
 			}
 			break;
 		case 1:
 			cout << "Clear your cart? (y/n)";
 			confirm = _getch();
 			if (confirm == 'Y' || confirm == 'y') {
-				roomVariety(user); // go back to shop with empty cart
+				homeUser(user); // go back to shop with empty cart
 			}
 			break;
 		case 3:
@@ -890,6 +891,7 @@ Booking bookingUser(Account user, Booking view) {
 void homeAdmin(Account user) {
 
 	Feedback fBack;
+	Booking bView;
 
 	Menu homeMenus;
 	ArrowMenu homeMenu;
@@ -912,7 +914,7 @@ void homeAdmin(Account user) {
 			roomsAdmin(user);
 			break;
 		case 2:
-			bookingAdmin(user);
+			bView = bookingAdmin(user, bView);
 			break;
 		case 3:
 			fBack = feedbackAdmin(user, fBack);
@@ -955,9 +957,6 @@ Feedback feedbackAdmin(Account user, Feedback view) {
 	}
 }
 
-void bookingAdmin(Account user) {
-
-}
 
 void roomsAdmin(Account user) {
 	roomVariety newBedroom;
@@ -1029,6 +1028,44 @@ roomVariety viewRoomAdmin(Account user, roomVariety newBedroom){
 		
 		case 0:
 			return newRoom;
+			break;
+		}
+	}
+}
+
+Booking bookingAdmin(Account user, Booking view)
+{
+	Booking pengguna;
+	pengguna.user = user.userId;
+
+	vector<Booking> displayBooking;
+	displayBooking = Booking::findBookingAdmin();
+	ArrowMenu cartM;
+	cartM.addOption("Back");
+	stringstream tmpString;
+
+	tmpString << fixed << setprecision(2) << setw(5) << "BID" << "|" << setw(5) << "Room Name"
+		<< "|" << setw(5) << "Quantity" << "|" << setw(5) << "Pax" << "|"
+		<< setw(15) << "Check In Date" << "|" << setw(15) << "Check Out Date" << "|"
+		<< setw(10) << "Price" << "|" << endl;
+
+	for (int i = 0; i < displayBooking.size(); i++) {
+		tmpString << setw(5) << displayBooking[i].reservationID << "|" << setw(5) << displayBooking[i].roomName << "|"
+			<< setw(5) << displayBooking[i].quantity << "|" << setw(5) << displayBooking[i].pax << "|"
+			<< setw(15) << displayBooking[i].checkInDate << "|"
+			<< setw(15) << displayBooking[i].checkOutDate << "|"
+			<< setw(10) << displayBooking[i].price << "|" << endl;
+	}
+	cartM.header = "Your Booking, " + user.name + "\n" + tmpString.str();
+
+	int option = 0;
+	while (1) {
+
+		option = cartM.prompt(option);
+		switch (option)
+		{
+		case 0:
+			return view;
 			break;
 		}
 	}

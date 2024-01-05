@@ -67,7 +67,28 @@ void Booking::insert() {
 
 std::vector<Booking> Booking::findBookingAdmin()
 {
-	return std::vector<Booking>();
+	string query = "SELECT * FROM `booking` ";
+	DBConnection db;
+
+	db.prepareStatement(query);
+	//db.stmt->setInt(1, user);
+	vector<Booking> roomA;
+	db.QueryResult();
+
+
+	if (db.res->rowsCount() > 0) {
+
+		while (db.res->next()) {
+			Booking tmpRoom(db.res);
+			roomA.push_back(tmpRoom);
+
+		}
+	}
+
+	db.~DBConnection();
+	return roomA;
+
+
 }
 
 

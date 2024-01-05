@@ -27,7 +27,7 @@ public:
 	void insert();
 
 	static std::vector<Booking> findBooking(int user);
-	std::vector<Booking> findBookingAdmin();
+	static std::vector<Booking> findBookingAdmin();
 
 	~Booking() {
 
