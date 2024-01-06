@@ -28,6 +28,7 @@ public:
 
 	static std::vector<Booking> findBooking(int user);
 	static std::vector<Booking> findBookingAdmin();
+	static void updateRoomTypeCapacity(int roomTypeId, int increment);
 
 	~Booking() {
 

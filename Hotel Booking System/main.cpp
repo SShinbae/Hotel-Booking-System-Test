@@ -1006,19 +1006,35 @@ roomVariety viewRoomAdmin(Account user, roomVariety newBedroom){
 	//Display
 	stringstream tmpAdmin;
 	roomMenu.display();
-	tmpAdmin << fixed << setprecision(2) << setw(5) << "RoomID" << "|" << setw(10) << "Room Type"
-		<< "|" << setw(20) << "name" << "|" << setw(20) << "Availability" 
-		<< "|" << setw(20) << "Price" << endl;
+	// Top border of the table
+	tmpAdmin << "+" << setfill('-') << setw(10) << "+" << setw(25)
+		<< "+" << setw(40) << "+" << setw(16) << "+" << setfill(' ') << endl;
 
-	for (int i = 0; i < dispRoom.size(); i++) {
-		tmpAdmin << setw(5) << dispRoom[i].roomID << "|" << setw(10)
-			<< dispRoom[i].rType << "|" << setw(20)
-			<< dispRoom[i].name << "|" << setw(20)
-			<< dispRoom[i].availability
-			<< "|" << setw(20) << dispRoom[i].price << endl;
+	// Header with vertical lines
+	tmpAdmin << "|" << left << setw(8) << "RoomID" << " |"
+		<< setw(23) << " Room Number" << " |"
+		<< setw(38) << " Description" << " |"
+		<< right << setw(14) << " Price" << " |" << endl;
+
+	// Underline header (bottom border of the header)
+	tmpAdmin << "+" << setfill('-') << setw(10) << "+" << setw(25)
+		<< "+" << setw(40) << "+" << setw(16) << "+" << setfill(' ') << endl;
+
+	for (const auto& room : dispRoom) {
+		// Data rows with vertical lines and left/right borders
+		tmpAdmin << "|" << left << setw(8) << room.roomID << " |"
+			<< setw(23) << room.name << " |"
+			<< setw(38) << room.availability << " |"
+			<< right << setw(14) << fixed << setprecision(2) << room.price << " |" << endl;
 	}
+
+	// Bottom border of the table
+	tmpAdmin << "+" << setfill('-') << setw(10) << "+" << setw(25)
+		<< "+" << setw(40) << "+" << setw(16) << "+" << setfill(' ') << endl;
+
+
 	roomMenu.header = "List of Room at WMA Hotel "  "\n" + tmpAdmin.str();
-	//cartM.header = "Your Feedback " + user.name + "\n" + tmpString.str();
+	
 
 	int option = 0;
 	while (1) {
@@ -1131,9 +1147,9 @@ void addRoomAdmin(Account user)
 	ArrowMenu roomMenu;
 
 	roomMenu.addOption("Enter Room Type ID ");
-	roomMenu.addOption("Enter Room Name ");
+	roomMenu.addOption("Enter Room Number ");
 	roomMenu.addOption("Enter Room Price ");
-	roomMenu.addOption("Enter Availability ");
+	roomMenu.addOption("Enter Description ");
 	roomMenu.addOption("Submit ");
 
 
@@ -1165,9 +1181,9 @@ void addRoomAdmin(Account user)
 			roomMenu.setValue(0, std::to_string(nRoom.rType));
 			break;
 		case 1:
-			cout << "Insert Room Name: ";
+			cout << "Insert Room Number: ";
 			cin.ignore(); // Add this line to consume the newline character
-			getline(cin, nRoom.name);
+			cin >> nRoom.name;
 			roomMenu.setValue(1, nRoom.name);
 			break;
 		case 2:
@@ -1177,14 +1193,16 @@ void addRoomAdmin(Account user)
 			roomMenu.setValue(2, std::to_string(nRoom.price));
 			break;
 		case 3:
-			cout << "Insert Room Availability (YES OR NO): ";
+			cout << "Insert Room Description: ";
 			cin.ignore();
 			getline(cin, nRoom.availability);
 			roomMenu.setValue(3, nRoom.availability);
 			break;
 		case 4:
 			nRoom.insertR();
-			cout << "Submit";
+			// Update capacity of the room type
+			Booking::updateRoomTypeCapacity(nRoom.rType, 1); // Increment capacity by 1
+			cout << "Room added and capacity updated.";
 			_getch();
 			return;
 			break;

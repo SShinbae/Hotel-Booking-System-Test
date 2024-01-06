@@ -91,6 +91,27 @@ std::vector<Booking> Booking::findBookingAdmin()
 
 }
 
+void Booking::updateRoomTypeCapacity(int roomTypeId, int increment)
+{
+		DBConnection db;
+
+		try {
+			std::string query = "UPDATE roomtypes SET capacity = capacity + ? WHERE roomtypeID = ?";
+			db.prepareStatement(query);
+			db.stmt->setInt(1, increment); // Increment value
+			db.stmt->setInt(2, roomTypeId); // Room Type ID
+
+			db.QueryStatement(); // Execute the update query
+
+			std::cout << "Room type capacity updated successfully." << std::endl;
+		}
+		catch (std::exception& e) {
+			std::cerr << "Error updating room type capacity: " << e.what() << std::endl;
+			// Handle the error appropriately
+		}
+	
+}
+
 
 
 
