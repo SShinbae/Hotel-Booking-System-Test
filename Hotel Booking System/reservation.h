@@ -11,14 +11,14 @@ class Reservation
 public:
 
 	std::string dateTime, checkInDate, checkOutDate;
-	int reservationID, user, pax;
+	int reservationID, user;
 	
 	
 
 	std::vector<std::pair<roomVariety,int>> items; // pair of product and its quantity, represents the transaction_item table
 
 	Reservation();
-	void addQuantity(roomVariety room, int quantity, int pax, std::string checkInDate, std::string checkOutDate);
+	void addQuantity(roomVariety room, int quantity,  std::string checkInDate, std::string checkOutDate);
 	void insert();
 	double total();
 	int count();

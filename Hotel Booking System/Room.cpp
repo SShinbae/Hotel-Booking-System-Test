@@ -9,8 +9,7 @@ roomVariety::roomVariety() {
 	price = 0;
 	availability = "";
 	quantity = 0;
-	//pax = 0;
-	//user = 0;
+	description = "";
 }
 
 roomVariety::roomVariety(sql::ResultSet* data) {
@@ -19,8 +18,7 @@ roomVariety::roomVariety(sql::ResultSet* data) {
 	rType = data->getInt("rType");
 	price = data->getDouble("price");
 	availability = data->getString("availability");
-	//user = data->getInt("user");
-	//category = data->getInt("category");
+	description = data->getString("description");
 }
 
 vector<roomVariety> roomVariety::findRoom(int rType,string keyword, double minPrice,
@@ -43,7 +41,6 @@ vector<roomVariety> roomVariety::findRoom(int rType,string keyword, double minPr
 	db.stmt->setDouble(3, minPrice);
 	db.stmt->setDouble(4, maxPrice);
 	db.stmt->setInt(5, rType);
-	//db.stmt->setInt(6, category);
 	
 
 	vector<roomVariety> rooms;
@@ -66,11 +63,12 @@ void roomVariety::insertR()
 {
 	DBConnection db;//instantiate
 	try {
-		db.prepareStatement("INSERT INTO room (rType, name, price, availability) VALUES (?,?,?,?)");
+		db.prepareStatement("INSERT INTO room (rType, name, price, description, availability) VALUES (?,?,?,?,?)");
 		db.stmt->setInt(1, rType);
 		db.stmt->setString(2, name);
 		db.stmt->setDouble(3, price);
-		db.stmt->setString(4, availability);
+		db.stmt->setString(4, description);
+		db.stmt->setString(5, availability);
 		db.QueryStatement();
 
 	}
@@ -78,6 +76,15 @@ void roomVariety::insertR()
 		std::cerr << "Error inserting into the database: " << e.what() << std::endl;
 		// Handle the error as needed (e.g., log, display an error message)
 	}
+}
+
+std::string roomVariety::getAvailability()
+{
+	return std::string();
+}
+
+void roomVariety::setAvailability(const std::string& type){
+	availability = type;
 }
 
 

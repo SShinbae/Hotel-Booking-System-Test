@@ -15,11 +15,10 @@ Booking::Booking(ResultSet* data) {
 	checkInDate = data->getString("checkInDate");
 	checkOutDate = data->getString("checkOutDate");
 	roomName = data->getString("roomName");
-	pax = data->getInt("pax");
 	price = data->getInt("price");
 }
 
-Booking::Booking(int reservationID, int rID, int quantity, int pax, int user, int price, 
+Booking::Booking(int reservationID, int rID, int quantity, int user, int price, 
 	std::string checkInDate, std::string checkOutDate,std::string roomName)
 {
 	
@@ -30,11 +29,10 @@ Booking::Booking(int reservationID, int rID, int quantity, int pax, int user, in
 	this->checkInDate = checkInDate;
 	this->checkOutDate = checkOutDate;
 	this->roomName = roomName;
-	this->pax = pax;
 	this->price = price;
 }
 
-std::vector<Booking> Booking::bookingConfirmation(int reservationID, int rID, int quantity, int pax, int user, int price, std::string checkInDate, std::string checkOutDate, std::string roomName)
+std::vector<Booking> Booking::bookingConfirmation(int reservationID, int rID, int quantity, int user, int price, std::string checkInDate, std::string checkOutDate, std::string roomName)
 {
 	return std::vector<Booking>();
 }
@@ -43,16 +41,15 @@ void Booking::insert() {
 
 	DBConnection db;//instantiate
 	try {
-		db.prepareStatement("INSERT INTO booking (rID, user, quantity,pax, checkInDate, checkOutDate, roomName, price) VALUES (?,?,?,?,?,?,?,?)");
+		db.prepareStatement("INSERT INTO booking (rID, user, quantity, checkInDate, checkOutDate, roomName, price) VALUES (?,?,?,?,?,?,?,?)");
 		
 		db.stmt->setInt(1, rID);
 		db.stmt->setInt(2, user);
 		db.stmt->setInt(3, quantity);
-		db.stmt->setInt(4, pax);
-		db.stmt->setString(5, checkInDate);
-		db.stmt->setString(6, checkOutDate);
-		db.stmt->setString(7, roomName);
-		db.stmt->setDouble(8, price);
+		db.stmt->setString(4, checkInDate);
+		db.stmt->setString(5, checkOutDate);
+		db.stmt->setString(6, roomName);
+		db.stmt->setDouble(7, price);
 		db.QueryStatement();
 
 	}
@@ -63,7 +60,6 @@ void Booking::insert() {
 
 }
 
-//std::vector<int> paxValues;
 
 std::vector<Booking> Booking::findBookingAdmin()
 {

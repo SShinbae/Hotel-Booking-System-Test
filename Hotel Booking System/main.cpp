@@ -242,7 +242,7 @@ void registerAccount() {
 
 void loginMenu() {
 	ArrowMenu loginMenu;
-	loginMenu.header = "WMA Hotel Login\n ";
+	loginMenu.header = "WMA Hotel Login";
 	loginMenu.addOption("username");
 	loginMenu.addOption("password");
 	loginMenu.addOption("Login"); 
@@ -628,7 +628,6 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley) {
 		_getch();
 		return trolley;
 	}
-
 	ArrowMenu productMenu;
 	productMenu.addOption("Add to Trolley ");
 	productMenu.header = "Product Details:\n"
@@ -643,7 +642,7 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley) {
 		}
 			   break;
 		case 0: {
-			int qty, pax;
+			int qty;
 			std::string checkInDate, checkOutDate;
 
 			while (true) {
@@ -654,17 +653,6 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley) {
 				}
 				else {
 					cout << "Quantity must be greater than 0. Please try again.\n";
-				}
-			}
-
-			while (true) {
-				cout << "Insert Pax: ";
-				cin >> pax;
-				if (pax > 0) {
-					break; // valid pax
-				}
-				else {
-					cout << "Pax must be greater than 0. Please try again.\n";
 				}
 			}
 
@@ -684,7 +672,7 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley) {
 				}
 			}
 			cout << "Add to Cart";
-			trolley.addQuantity(rooms, qty, pax, checkInDate, checkOutDate);
+			trolley.addQuantity(rooms, qty, checkInDate, checkOutDate);
 			_getch();
 			break;
 		}
@@ -700,12 +688,12 @@ Reservation trolleyMenu(Account user, Reservation trolley) {
 	trolleyM.addOption("Checkout");
 	trolleyM.addOption("Empty Cart");
 	stringstream ss;
-	ss << fixed << setprecision(2) << setw(20) << "Room Name|" << setw(20) << "Price|" << setw(20)
-		<< "Quantity|" <<  setw(20) << "Pax|" << setw(20) << "Check In Date|" << setw(20) 
+	ss << fixed << setprecision(2) << setw(20) << "Room Number|" << setw(20) << "Price|" << setw(20)
+		<< "Quantity|"  << setw(20) << "Check In Date|" << setw(20) 
 		<< "Check Out Date|" << setw(20) << "Subtotal|" << endl;
 	for (int i = 0; i < trolley.items.size(); i++) {
 		ss << setw(20) << trolley.items[i].first.name << setw(20) << trolley.items[i].first.price 
-			<< setw(20)<< trolley.items[i].second << setw(20) << trolley.items[i].first.pax
+			<< setw(20)<< trolley.items[i].second
 			<< setw(20) << trolley.items[i].first.checkInDate << setw(20) << trolley.items[i].first.checkOutDate
 			<< setw(20) << (trolley.items[i].first.price * trolley.items[i].second) << endl;
 	}
@@ -857,14 +845,14 @@ Booking bookingUser(Account user, Booking view) {
 	cartM.addOption("Back");
 	stringstream tmpString;
 
-	tmpString << fixed << setprecision(2) << setw(5) << "BID" << "|" << setw(5) << "Room Name"
-		<< "|" << setw(5) << "Quantity"<< "|" << setw(5) << "Pax" << "|" 
+	tmpString << fixed << setprecision(2) << setw(5) << "BID" << "|" << setw(5) << "Room Number"
+		<< "|" << setw(5) << "Quantity"<< "|" 
 		<< setw(15) << "Check In Date" << "|" << setw(15) << "Check Out Date" << "|" 
 		<< setw(10) << "Price" << "|" << endl;
 
 	for (int i = 0; i < displayBooking.size(); i++) {
 		tmpString << setw(5) << displayBooking[i].reservationID << "|" << setw(5) << displayBooking[i].roomName << "|"
-			<< setw(5) << displayBooking[i].quantity<< "|" << setw(5) << displayBooking[i].pax << "|" 
+			<< setw(5) << displayBooking[i].quantity<< "|" 
 			<< setw(15) << displayBooking[i].checkInDate << "|" 
 			<< setw(15) << displayBooking[i].checkOutDate << "|" 
 			<< setw(10) << displayBooking[i].price << "|" << endl;
@@ -884,7 +872,6 @@ Booking bookingUser(Account user, Booking view) {
 	}
 
 }
-
 
 
 //admin
@@ -950,6 +937,9 @@ Feedback feedbackAdmin(Account user, Feedback view) {
 		option = cartM.prompt(option);
 		switch (option)
 		{
+		case -1:
+			return view;
+			break;
 		case 0:
 			return view;
 			break;
@@ -966,7 +956,6 @@ void roomsAdmin(Account user) {
 	bedroomM.addOption("Add Room Type ");
 	bedroomM.addOption("Add Room ");
 	bedroomM.addOption("View Room ");
-	bedroomM.addOption("Search Room");
 
 
 	while (1)
@@ -985,9 +974,6 @@ void roomsAdmin(Account user) {
 		case 2:
 			newBedroom = viewRoomAdmin(user, newBedroom);
 			break;
-		/*case 3:
-			searchRoom(user);
-			break:*/
 		}
 	}
 }
@@ -1006,50 +992,47 @@ roomVariety viewRoomAdmin(Account user, roomVariety newBedroom){
 	//Display
 	stringstream tmpAdmin;
 	roomMenu.display();
-	// Top border of the table
-	tmpAdmin << "+" << setfill('-') << setw(10) << "+" << setw(25)
-		<< "+" << setw(40) << "+" << setw(16) << "+" << setfill(' ') << endl;
 
 	// Header with vertical lines
 	tmpAdmin << "|" << left << setw(8) << "RoomID" << " |"
 		<< setw(23) << " Room Number" << " |"
 		<< setw(38) << " Description" << " |"
+		<< setw(14) << " Availability" << " |"
 		<< right << setw(14) << " Price" << " |" << endl;
 
 	// Underline header (bottom border of the header)
 	tmpAdmin << "+" << setfill('-') << setw(10) << "+" << setw(25)
-		<< "+" << setw(40) << "+" << setw(16) << "+" << setfill(' ') << endl;
+		<< "+" << setw(40) << "+" << setw(16) << "+" << setw(16)
+		<< "+" << setfill(' ') << endl;
 
 	for (const auto& room : dispRoom) {
 		// Data rows with vertical lines and left/right borders
 		tmpAdmin << "|" << left << setw(8) << room.roomID << " |"
 			<< setw(23) << room.name << " |"
-			<< setw(38) << room.availability << " |"
+			<< setw(38) << room.description << " |"
+			<< setw(14) << room.availability << " |"
 			<< right << setw(14) << fixed << setprecision(2) << room.price << " |" << endl;
 	}
 
-	// Bottom border of the table
-	tmpAdmin << "+" << setfill('-') << setw(10) << "+" << setw(25)
-		<< "+" << setw(40) << "+" << setw(16) << "+" << setfill(' ') << endl;
-
-
-	roomMenu.header = "List of Room at WMA Hotel "  "\n" + tmpAdmin.str();
+	roomMenu.header = "List of Room at WMA Hotel\n\n" + tmpAdmin.str();
 	
-
 	int option = 0;
 	while (1) {
 
 		option = roomMenu.prompt(option);
 		switch (option) {
-		
+		case -1:
+			return newRoom;
+			break;
 		case 0:
 			return newRoom;
 			break;
 		}
 	}
 }
-
+//display all booking
 Booking bookingAdmin(Account user, Booking view)
+
 {
 	Booking pengguna;
 	pengguna.user = user.userId;
@@ -1060,19 +1043,27 @@ Booking bookingAdmin(Account user, Booking view)
 	cartM.addOption("Back");
 	stringstream tmpString;
 
-	tmpString << fixed << setprecision(2) << setw(5) << "BID" << "|" << setw(5) << "Room Name"
-		<< "|" << setw(5) << "Quantity" << "|" << setw(5) << "Pax" << "|"
-		<< setw(15) << "Check In Date" << "|" << setw(15) << "Check Out Date" << "|"
-		<< setw(10) << "Price" << "|" << endl;
+	tmpString << "|" << left << setw(10) << "BookingID" << " |" 
+		<< setw(10) << "Room Name" << " |" 
+		<< setw(10) << "Quantity" << " |" 
+		<< setw(15) << "Check In Date" << " |" 
+		<< setw(15) << "Check Out Date" << " |"
+		<< right << setw(10) << "Price" << " |" << endl;
 
-	for (int i = 0; i < displayBooking.size(); i++) {
-		tmpString << setw(5) << displayBooking[i].reservationID << "|" << setw(5) << displayBooking[i].roomName << "|"
-			<< setw(5) << displayBooking[i].quantity << "|" << setw(5) << displayBooking[i].pax << "|"
-			<< setw(15) << displayBooking[i].checkInDate << "|"
-			<< setw(15) << displayBooking[i].checkOutDate << "|"
-			<< setw(10) << displayBooking[i].price << "|" << endl;
+	tmpString << "+" << setfill('-') << setw(12) << "+" << setw(12)
+		<< "+" << setw(12) << "+"  << setw(17) << "+" << setw(17)
+		<< "+" << setw(12) << "+" << setfill(' ') << endl;
+
+	for (const auto& room :displayBooking) {
+		tmpString << "|" << left << setw(10) << room.reservationID << " |"
+			<< setw(10) << room.roomName << " |"
+			<< setw(10) << room.quantity << " |"
+			<< setw(15) << room.checkInDate << " |"
+			<< setw(15) << room.checkOutDate << " |"
+			<< right << setw(10) << fixed << setprecision(2) << room.price << " |" << endl;
+
 	}
-	cartM.header = "Your Booking, " + user.name + "\n" + tmpString.str();
+	cartM.header = "All Customer Booking " + user.name + "\n\n" + tmpString.str();
 
 	int option = 0;
 	while (1) {
@@ -1080,6 +1071,9 @@ Booking bookingAdmin(Account user, Booking view)
 		option = cartM.prompt(option);
 		switch (option)
 		{
+		case -1:
+			return view;
+			break;
 		case 0:
 			return view;
 			break;
@@ -1141,9 +1135,6 @@ void addRoomAdmin(Account user)
 	Bedroom newRoom;
 	vector<Bedroom> displayRoom;
 	displayRoom = Bedroom::findBedroom();
-
-
-
 	ArrowMenu roomMenu;
 
 	roomMenu.addOption("Enter Room Type ID ");
@@ -1156,17 +1147,28 @@ void addRoomAdmin(Account user)
 	//Display room type Menu
 	stringstream tmpAdmin;
 	roomMenu.display();
-	tmpAdmin << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(20) << "Type"
-		<< "|" << setw(20) << "Capacity" << "|" << setw(20) << "Description" << endl;
+	tmpAdmin << fixed << setprecision(2)
+		<< setw(5) << "ID" << " | "
+		<< setw(20) << "Type" << " | "
+		<< setw(20) << "Capacity" << " | "
+		<< setw(20) << "Description" << " |" << endl;
 
-	for (int i = 0; i < displayRoom.size(); i++) {
-		tmpAdmin << setw(5) << displayRoom[i].roomtypeID << "|" << setw(20)
-			<< displayRoom[i].type << "|" << setw(20)
-			<< displayRoom[i].capacity << "|" << setw(20) << displayRoom[i].description << endl;
+	// Add a divider for clarity (optional)
+	tmpAdmin << setw(5) << setfill('-') << "-" << setfill(' ') << " + "
+		<< setw(20) << setfill('-') << "-" << setfill(' ') << " + "
+		<< setw(20) << setfill('-') << "-" << setfill(' ') << " + "
+		<< setw(20) << setfill('-') << "-" << setfill(' ') << " +" << endl;
+
+	// Data rows with vertical lines
+	for (const auto& room : displayRoom) {
+		tmpAdmin << setw(5) << room.roomtypeID << " | "
+			<< setw(20) << room.type << " | "
+			<< setw(20) << room.capacity << " | "
+			<< setw(20) << room.description << " |" << endl;
 	}
-	roomMenu.header = "Please Select ID based on the table"  "\n" + tmpAdmin.str();
-	//cartM.header = "Your Feedback " + user.name + "\n" + tmpString.str();
+	roomMenu.header = "Please Select ID based on the table\n\n" + tmpAdmin.str();
 
+	nRoom.availability = "YES";
 	int option = 0;
 	while (1) {
 
@@ -1182,7 +1184,7 @@ void addRoomAdmin(Account user)
 			break;
 		case 1:
 			cout << "Insert Room Number: ";
-			cin.ignore(); // Add this line to consume the newline character
+			cin.ignore(); 
 			cin >> nRoom.name;
 			roomMenu.setValue(1, nRoom.name);
 			break;
@@ -1195,13 +1197,13 @@ void addRoomAdmin(Account user)
 		case 3:
 			cout << "Insert Room Description: ";
 			cin.ignore();
-			getline(cin, nRoom.availability);
-			roomMenu.setValue(3, nRoom.availability);
+			getline(cin, nRoom.description);
+			roomMenu.setValue(3, nRoom.description);
 			break;
 		case 4:
 			nRoom.insertR();
 			// Update capacity of the room type
-			Booking::updateRoomTypeCapacity(nRoom.rType, 1); // Increment capacity by 1
+			Booking::updateRoomTypeCapacity(nRoom.rType, 1);
 			cout << "Room added and capacity updated.";
 			_getch();
 			return;
@@ -1211,7 +1213,6 @@ void addRoomAdmin(Account user)
 	}
 }
 
-// Helper function to parse date string to time_point
 std::chrono::system_clock::time_point parseDate(const std::string& dateStr) {
 	std::istringstream ss(dateStr);
 	std::tm dt = {};
