@@ -19,7 +19,7 @@ public:
 
 	Booking(sql::ResultSet* data);
 
-	Booking(int reservationID, int rID, int quantity, int user, int price, std::string checkInDate, std::string checkOutDate, std::string roomName);
+	Booking(int reservationID, int rID, int quantity, int user, double price, std::string checkInDate, std::string checkOutDate, std::string roomName);
 	static std::vector<Booking> bookingConfirmation(int reservationID, int rID, int quantity, 
 		int user,int price, std::string checkInDate, std::string checkOutDate,std::string roomName);
 	

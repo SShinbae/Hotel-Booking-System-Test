@@ -15,10 +15,10 @@ Booking::Booking(ResultSet* data) {
 	checkInDate = data->getString("checkInDate");
 	checkOutDate = data->getString("checkOutDate");
 	roomName = data->getString("roomName");
-	price = data->getInt("price");
+	price = data->getDouble("price");
 }
 
-Booking::Booking(int reservationID, int rID, int quantity, int user, int price, 
+Booking::Booking(int reservationID, int rID, int quantity, int user, double price, 
 	std::string checkInDate, std::string checkOutDate,std::string roomName)
 {
 	

@@ -25,37 +25,36 @@ vector<roomVariety> roomVariety::findRoom(int rType,string keyword, double minPr
 	double maxPrice, string sortColumn, bool ascending) {
 
 	string query = "SELECT * FROM `room` WHERE "
-		" (name LIKE ? OR availability LIKE ?) AND price >= ? AND price <= ? AND rType = ? "
-		" ORDER BY " + sortColumn;
-	if (ascending) {
-		query += " ASC";
-	}
-	else {
-		query += " DESC";
-	}
+		"(name LIKE ? AND availability = 'YES') AND price >= ? AND price <= ? AND rType = ? "
+		"ORDER BY " + sortColumn + (ascending ? " ASC" : " DESC");
 	// 
 	DBConnection db;
 	db.prepareStatement(query);
 	db.stmt->setString(1, "%" + keyword + "%");
-	db.stmt->setString(2, "%" + keyword + "%");
-	db.stmt->setDouble(3, minPrice);
-	db.stmt->setDouble(4, maxPrice);
-	db.stmt->setInt(5, rType);
-	
+	db.stmt->setDouble(2, minPrice);
+	db.stmt->setDouble(3, maxPrice);
+	db.stmt->setInt(4, rType);
 
 	vector<roomVariety> rooms;
 
-	db.QueryResult();
-	if (db.res->rowsCount() > 0) {
-
-		while (db.res->next()) {
-			roomVariety tmpRoom(db.res);
-			rooms.push_back(tmpRoom);
-
+	// Execute the query and handle results
+	try {
+		db.QueryResult();
+		if (db.res->rowsCount() > 0) {
+			while (db.res->next()) {
+				roomVariety tmpRoom(db.res);
+				rooms.push_back(tmpRoom);
+			}
 		}
 	}
+	catch (const sql::SQLException& e) {
+		// Handle SQL exceptions here
+		// For example, log the exception details:
+		std::cerr << "SQL Error: " << e.what() << " (MySQL error code: " << e.getErrorCode()
+			<< ", SQLState: " << e.getSQLState() << ")" << std::endl;
+	}
 
-	db.~DBConnection();
+	
 	return rooms;
 }
 
@@ -105,12 +104,10 @@ roomVariety roomVariety::findRoom(int roomID) {
 	return result;
 }
 
-std::vector<roomVariety> roomVariety::findRooms()
-{
+std::vector<roomVariety> roomVariety::findRooms(){
 
-	string querys = "SELECT * FROM `room` ";
+	string querys = "SELECT * FROM `room` WHERE TRIM(availability) = 'YES'";
 
-	// 
 	DBConnection db;
 
 	db.prepareStatement(querys);

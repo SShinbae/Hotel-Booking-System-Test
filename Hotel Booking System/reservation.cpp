@@ -1,4 +1,5 @@
 #include "reservation.h"
+#include "AddRoom.h"
 #include <string> 
 #include<vector>
 #include <chrono>
@@ -50,7 +51,22 @@ void Reservation::insert() {
             db.prepareStatement(updateQuery);
             db.stmt->setInt(1, item.first.roomID); // Bind the room ID parameter
             db.QueryStatement();
+
         }
+
+        for (const auto& item : items)
+        {
+            // Decrement the capacity
+            string updateCapacityQuery = "UPDATE roomtypes SET capacity = capacity - ? WHERE roomtypeID = ?";
+            db.prepareStatement(updateCapacityQuery);
+            db.stmt->setInt(1, item.second); // Assuming 'item.second' is the number of rooms booked
+            db.stmt->setInt(2, item.first.rType);
+            db.QueryStatement();
+        }
+
+
+
+
     }
     catch (const std::exception& e) {
         cout << "SQL Error: " << e.what() << endl;

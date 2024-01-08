@@ -590,19 +590,31 @@ Reservation roomType(Account user, int rType, Reservation trolley) {
 		case 5:
 
 			roomType = roomVariety::findRoom(rType, keyWord, minPrice, maxPrice, sortColumn, ascending);
+			if (roomType.empty()) {
+				// If no rooms are available, display the message and skip to the next iteration of the loop
+				cout << "No Room Available" << endl;
+				_getch();
+				continue; // Skip the rest of the current iteration and start at the top of the loop
+			}
 			roomSelect.clearOption();
 			stringstream tmpString;
-			tmpString << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(20) << "Name"
-				<< "|" << setw(10) << "Price" << "|" << setw(20) << "Description" << "|" << endl;
+			tmpString << "|" << left << setw(5) << "ID" << " |" 
+				<< setw(20) << "Room Number"<< " |" 
+				<< setw(10) << fixed << setprecision(2) << "Price" << " |"
+				<< right <<setw(20) << "Description" << " |" << endl;
 
-			roomSelect.header = tmpString.str();
-			tmpString.str("");
-			for (int i = 0; i < roomType.size(); i++) {
-				tmpString << setw(5) << roomType[i].roomID << "|" << setw(20) << roomType[i].name
-					<< "|" << setw(10) << roomType[i].price << "|" << setw(20) << roomType[i].availability << "|" << endl;
-				roomSelect.addOption(tmpString.str());
-				tmpString.str("");
+			tmpString << "+" << setfill('-') << setw(7) << "+" 
+				<< setw(22) << "+" << setw(12) << "+"
+				<< setw(22) << "+" << setfill(' ') << endl;
 
+			for (const auto& room : roomType) {
+				tmpString << setw(5) << room.roomID << " |" 
+					<< setw(20) << room.name << " |" 
+					<< setw(10) << fixed << setprecision(2)  << room.price << " |"
+					<< right <<setw(20) << room.availability << " |" << endl;
+				roomSelect.addOption(tmpString.str());  // Ensure this is being called
+				tmpString.str("");  // Clear the contents of tmpString for the next room
+				tmpString.clear();  // Clear any error state of the stream
 			}
 			selectedRoom = 0;
 			while (1) {
@@ -724,8 +736,7 @@ Reservation trolleyMenu(Account user, Reservation trolley) {
 				homeUser(user); // go back to shop with empty cart
 			}
 			break;
-		case 3:
-			return trolley;
+	
 		}
 
 	}
@@ -774,14 +785,22 @@ Feedback viewFeedback(Account user, Feedback view) {
 	cartM.addOption("Back");
 	stringstream tmpString;
 
-	tmpString << fixed << setprecision(2) << setw(5) << "ID" << "|" << setw(40) << "Messages"
-		<< "|" << setw(20) << "Date & Time" << endl;
+	tmpString << "|" << left << setw(10) << "FeedbackID" << " |"
+		<< setw(5) << "CID" << " |"
+		<< setw(40) << "Messages" << " |"
+		<< right << setw(20) << "Date & Time" << " |" << endl;
+	//Underline header
+	tmpString << "+" << setfill('-') << setw(12) << "+" << setw(7)
+		<< "+" << setw(42) << "+" << setw(22)
+		<< "+" << setfill(' ') << endl;
 
-	for (int i = 0; i < displayFeedback.size(); i++) {
-		tmpString << setw(5) << displayFeedback[i].feedBackId << "|" << setw(40) << displayFeedback[i].messages
-			<< "|" << setw(10) << displayFeedback[i].date << endl;
+	for (const auto& feed : displayFeedback) {
+		tmpString << "|" << left << setw(10) << feed.feedBackId << " |"
+			<< setw(5) << feed.user << " |"
+			<< setw(40) << feed.messages << " |"
+			<< right << setw(20) << feed.date << " |" << endl;
 	}
-	cartM.header = "Your Feedback " + user.name + "\n" + tmpString.str();
+	cartM.header = "Your Feedback, " + user.name + "\n\n" + tmpString.str() + "\n\n";
 
 	int option = 0;
 	while (1) {
@@ -789,6 +808,9 @@ Feedback viewFeedback(Account user, Feedback view) {
 		option = cartM.prompt(option);
 		switch (option)
 		{
+		case -1:
+			return view;
+			break;
 		case 0:
 			return view;
 			break;
@@ -857,7 +879,7 @@ Booking bookingUser(Account user, Booking view) {
 			<< setw(15) << displayBooking[i].checkOutDate << "|" 
 			<< setw(10) << displayBooking[i].price << "|" << endl;
 	}
-	cartM.header = "Your Booking, " + user.name + "\n" + tmpString.str();
+	cartM.header = "Your Booking, " + user.name + "\n\n" + tmpString.str();
 
 	int option = 0;
 	while (1) {
@@ -865,6 +887,9 @@ Booking bookingUser(Account user, Booking view) {
 		option = cartM.prompt(option);
 		switch (option)
 		{
+		case -1:
+			return view;
+			break;
 		case 0:
 			return view;
 			break;
@@ -920,16 +945,23 @@ Feedback feedbackAdmin(Account user, Feedback view) {
 	cartM.addOption("Back");
 	stringstream tmpString;
 
-	tmpString << fixed << setprecision(2) << setw(5) << "FID" << "|" << setw(5) << "CID" 
-		<< "|" << setw(40) << "Messages"
-		<< "|" << setw(20) << "Date & Time" << "|" << endl;
+	//Header Vertical Line
+	tmpString << "|" << left << setw(10) << "FeedbackID" << " |" 
+		<< setw(5) << "CID" << " |" 
+		<< setw(40) << "Messages" << " |" 
+		<< right << setw(20) << "Date & Time" << " |" << endl;
+	//Underline header
+	tmpString << "+" << setfill('-') << setw(12) << "+" << setw(7)
+		<< "+" << setw(42) << "+" << setw(22) 
+		<< "+" << setfill(' ') << endl;
 
-	for (int i = 0; i < displayFeedback.size(); i++) {
-		tmpString << setw(5) << displayFeedback[i].feedBackId << "|" << setw(5) << displayFeedback[i].user << "|"
-			<< setw(40) << displayFeedback[i].messages
-			<< "|" << setw(20) << displayFeedback[i].date << "|" << endl;
+	for (const auto& feed : displayFeedback) {
+		tmpString << "|" << left  << setw(10) << feed.feedBackId << " |"
+			<< setw(5) << feed.user << " |"
+			<< setw(40) << feed.messages<< " |" 
+			<< right << setw(20) << feed.date << " |" << endl;
 	}
-	cartM.header = "Your Feedback " + user.name + "\n" + tmpString.str();
+	cartM.header = "Your Feedback " + user.name + "\n\n" + tmpString.str();
 
 	int option = 0;
 	while (1) {
