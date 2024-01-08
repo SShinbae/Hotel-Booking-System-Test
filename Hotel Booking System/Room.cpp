@@ -25,7 +25,7 @@ vector<roomVariety> roomVariety::findRoom(int rType,string keyword, double minPr
 	double maxPrice, string sortColumn, bool ascending) {
 
 	string query = "SELECT * FROM `room` WHERE "
-		"(name LIKE ? AND availability = 'YES') AND price >= ? AND price <= ? AND rType = ? "
+		"(description LIKE ? AND availability = 'YES') AND price >= ? AND price <= ? AND rType = ? "
 		"ORDER BY " + sortColumn + (ascending ? " ASC" : " DESC");
 	// 
 	DBConnection db;
@@ -106,7 +106,7 @@ roomVariety roomVariety::findRoom(int roomID) {
 
 std::vector<roomVariety> roomVariety::findRooms(){
 
-	string querys = "SELECT * FROM `room` WHERE TRIM(availability) = 'YES'";
+	string querys = "SELECT * FROM `room`";
 
 	DBConnection db;
 
