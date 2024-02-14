@@ -5,7 +5,7 @@ using namespace std;
 
 Bedroom::Bedroom() {
 	//initialize
-	roomtypeID = 0;
+	roomTypeId = 0;
 	capacity = 0;
 	type = "";
 	description = "";
@@ -13,10 +13,10 @@ Bedroom::Bedroom() {
 }
 
 
-Bedroom::Bedroom(int roomtypeID, int capacity, std::string type, std::string description)
+Bedroom::Bedroom(int roomTypeId, int capacity, std::string type, std::string description)
 {
 	//roomType
-	this->roomtypeID = roomtypeID;
+	this->roomTypeId = roomTypeId;
 	this->capacity = capacity;
 	this->type = type;
 	this->description = description;
@@ -24,7 +24,7 @@ Bedroom::Bedroom(int roomtypeID, int capacity, std::string type, std::string des
 }
 //display room types
 Bedroom::Bedroom(sql::ResultSet* data) {
-	roomtypeID = data->getInt("roomtypeID");
+	roomTypeId = data->getInt("roomTypeId");
 	capacity = data->getInt("capacity");
 	type = data->getString("type");
 	description = data->getString("description");
@@ -37,7 +37,7 @@ void Bedroom::insertRT() {
 
 	DBConnection db;//instantiate
 	try {
-		db.prepareStatement("INSERT INTO roomTypes (type, capacity, description) VALUES (?,?,?)");
+		db.prepareStatement("INSERT INTO roomtypes (type, capacity, description) VALUES (?,?,?)");
 		db.stmt->setString(1, type);
 		db.stmt->setInt(2, capacity);
 		db.stmt->setString(3, description);

@@ -30,13 +30,12 @@ void loginMenu(); // login menu
 //admin
 void homeAdmin(Account user);
 Feedback feedbackAdmin(Account user, Feedback view);
-//void bookingAdmin(Account user);
 void roomsAdmin(Account user);
 void addRoomTypeAdmin(Account user);
 void addRoomAdmin(Account user);
 roomVariety viewRoomAdmin(Account user, roomVariety newBedroom); 
 Booking bookingAdmin(Account user, Booking view);
-//void searchRoomAdmin(Account user);
+
 
 //user
 void addFeedBack(Account user);
@@ -47,7 +46,7 @@ void feedbackUser(Account user);
 Account profile(Account user);
 Feedback viewFeedback(Account user,  Feedback view);
 Reservation roomType(Account user, int rType, Reservation trolley);
-Reservation roomDetails(Account user, int roomID, Reservation trolley);
+Reservation roomDetails(Account user, int roomId, Reservation trolley);
 Reservation trolleyMenu(Account user, Reservation trolley);
 
 //utility functions
@@ -66,7 +65,7 @@ string hideString(int);
 int main() {  
 	   
 	ArrowMenu mainmenu;
-	mainmenu.header = "Welcome to Hotel WMA";
+	mainmenu.header = "Welcome to Hotel Booking Management System";
 	mainmenu.addOption("Register");
 	mainmenu.addOption("Login"); 
 
@@ -93,7 +92,7 @@ void registerAccount() {
 	newacc.setUsertype("user");
 
 	ArrowMenu rgMenu;
-	rgMenu.header = "Hi, Welcome. This is Registration Form for WMA Hotel";
+	rgMenu.header = "Hi, Welcome to Hotel Booking Management System.\n This is Registration Form. Please Fill up ";
 	rgMenu.addOption("Name");
 	rgMenu.addOption("Number IC");
 	rgMenu.addOption("Phone Number ");
@@ -104,17 +103,14 @@ void registerAccount() {
 	rgMenu.addOption("Password Visibility");
 	rgMenu.addOption("Register");
 
-
-	string tmpinput;
-	string tmpinputP;
+	std::string tmpinput;
 	bool valid = true;
 	bool showPassword = false;
 	int option = 0;
-	string tmpPassword = "";// we use temporary string for password since we will only encrypt when finishing process
-	string inputIC = "";
-	while (1) {
-		if (showPassword) {
+	std::string tmpPassword = ""; // we use a temporary string for the password since we will only encrypt when finishing the process
 
+	while (true) {
+		if (showPassword) {
 			rgMenu.setValue(7, "SHOW");
 			rgMenu.setValue(6, tmpPassword);
 		}
@@ -122,118 +118,135 @@ void registerAccount() {
 			rgMenu.setValue(7, "HIDE");
 			rgMenu.setValue(6, hideString(tmpPassword));
 		}
+
 		option = rgMenu.prompt(option);
+
 		switch (option) {
 		case -1:
 			return;
 
 		case 0: {
-			cout << "Insert Name (alphabets only):  ";
-			getline(cin, newacc.name);
+			std::cout << "Insert Name (alphabets only):  ";
+			getline(std::cin, newacc.name);
 			// Check if the name is not empty and contains only alphabets and spaces
-			if (!newacc.name.empty() && newacc.name.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ") == std::string::npos) {
+			if (!newacc.name.empty() &&
+				std::all_of(newacc.name.begin(), newacc.name.end(), ::isalpha)) {
 				rgMenu.setValue(0, newacc.name);
 			}
 			else {
-				cout << "Invalid name. Please use alphabets and spaces only.\n";
+				std::cout << "Invalid name. Please use alphabets and spaces only.\n";
 				_getch();
 			}
 			break;
 		}
+
 		case 1: {
-			cout << "Insert Number IC (991012110212):";
-			cin >> newacc.numIc;
+			std::cout << "Insert Number IC (991012110212):";
+			std::cin >> newacc.numIc;
 			// Check if the IC number is exactly 12 characters and contains only digits
-			if (newacc.numIc.length() == 12 && newacc.numIc.find_first_not_of("0123456789") == std::string::npos) {
+			if (newacc.numIc.length() == 12 &&
+				std::all_of(newacc.numIc.begin(), newacc.numIc.end(), ::isdigit)) {
 				rgMenu.setValue(1, newacc.numIc);
 			}
 			else {
-				cout << "Number IC must be 12 characters and contain only digits.\n";
+				std::cout << "Number IC must be 12 characters and contain only digits.\n";
 				_getch();
+				continue; // Skip the rest of the loop and start from the beginning
 			}
 			break;
 		}
+
 		case 2:
-			cout << "Insert Phone Number (0131234560):";
-			cin >> newacc.phoneNum;
+			std::cout << "Insert Phone Number (0131234560):";
+			std::cin >> newacc.phoneNum;
 			if (newacc.phoneNum.length() == 11 || newacc.phoneNum.length() == 10) {
-			
 				rgMenu.setValue(2, newacc.phoneNum);
 			}
 			else {
-				cout << "Phone Number must be at least 10 or 11 number";
+				std::cout << "Phone Number must be at least 10 or 11 numbers.\n";
 				_getch();
+				continue; // Skip the rest of the loop and start from the beginning
 			}
 			break;
+
 		case 3: {
-			cout << "Insert email (example@gmail.com):";
-			getline(cin, newacc.email);
+			std::cout << "Insert email (example@gmail.com):";
+			getline(std::cin, newacc.email);
 			// Simple regex to validate email
 			std::regex emailRegex(R"(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)");
 			if (std::regex_match(newacc.email, emailRegex)) {
 				rgMenu.setValue(3, newacc.email);
 			}
 			else {
-				cout << "Invalid email format. Please try again.\n";
+				std::cout << "Invalid email format. Please try again.\n";
 				_getch();
+				continue; // Skip the rest of the loop and start from the beginning
 			}
 			break;
 		}
+
 		case 4: {
-			cout << "Insert Address:";
-			getline(cin, newacc.address);
+			std::cout << "Insert Address:";
+			getline(std::cin, newacc.address);
 			// Check if the address is not empty
 			if (!newacc.address.empty()) {
 				rgMenu.setValue(4, newacc.address);
 			}
 			else {
-				cout << "Address cannot be empty. Please try again.\n";
+				std::cout << "Address cannot be empty. Please try again.\n";
 				_getch();
+				continue; // Skip the rest of the loop and start from the beginning
 			}
 			break;
 		}
-		
-		case 5: 
-			cout << "Insert Username:";
-			cin >> newacc.username;
+
+		case 5: {
+			std::cout << "Insert Username:";
+			std::cin >> newacc.username;
 			// Check for username length or any other specific criteria
 			if (newacc.username.length() >= 4) { // Example: usernames should be at least 4 characters long
 				rgMenu.setValue(5, newacc.username);
 			}
 			else {
-				cout << "Username must be at least 4 characters long. Please try again.\n";
+				std::cout << "Username must be at least 4 characters long. Please try again.\n";
 				_getch();
+				continue; // Skip the rest of the loop and start from the beginning
 			}
 			break;
-		
-		case 6:
-			cout << "Insert password:";
+		}
+
+		case 6: {
+			std::cout << "Insert password:";
 			tmpinput = hiddenInput(tmpinput);
 			if (tmpinput.length() < 6) {
-				cout << "\nPassword must be at least 6 character long";
+				std::cout << "\nPassword must be at least 6 characters long.\n";
 				_getch();
+				continue; // Skip the rest of the loop and start from the beginning
 			}
 			else {
 				tmpPassword = tmpinput;
 			}
 			break;
+		}
+
 		case 7:
 			showPassword = !showPassword;
 			break;
+
 		case 8:
 			valid = true;
 
 			if (valid) {
-
 				newacc.setPassword(tmpPassword); // now only we set the temporary string into password to be encrypted
 				newacc.insert();
-				cout << "Registered";
+				std::cout << "Registered";
 				_getch();
 				return;
 			}
 			else {
-				cout << "Please re-check your informations";
+				std::cout << "Please re-check your information";
 				_getch();
+				continue; // Skip the rest of the loop and start from the beginning
 			}
 			break;
 		}
@@ -242,9 +255,9 @@ void registerAccount() {
 
 void loginMenu() {
 	ArrowMenu loginMenu;
-	loginMenu.header = "WMA Hotel Login";
-	loginMenu.addOption("username");
-	loginMenu.addOption("password");
+	loginMenu.header = "Login";
+	loginMenu.addOption("Username");
+	loginMenu.addOption("Password");
 	loginMenu.addOption("Login"); 
 
 	Account user;
@@ -309,7 +322,7 @@ void homeUser(Account user) {
 	homeMenu.addOption("Feedback");
 	//homeMenu.addOption("Logout");
 	while (1) {
-		homeMenu.header = "Welcome " + user.name + " to WMA Hotel";
+		homeMenu.header = "Welcome " + user.name ;
 		switch (homeMenu.prompt())
 		{
 		case -1:
@@ -332,152 +345,156 @@ void homeUser(Account user) {
 }
 
 Account profile(Account user) {
+    Account temp = user; // copy the object
 
-	Account temp = user; // copy the object
+    ArrowMenu profileMenu;
+    profileMenu.header = user.name + ", This is your profile";
+    profileMenu.addOption("Name");
+    profileMenu.addOption("Number IC");
+    profileMenu.addOption("Phone Number ");
+    profileMenu.addOption("Email");
+    profileMenu.addOption("Address");
+    profileMenu.addOption("Username");
+    profileMenu.addOption("Password");
+    profileMenu.addOption("Reset");
+    profileMenu.addOption("Save");
+    profileMenu.addOption("Back");
+    profileMenu.addOption("Delete Account");
 
-	ArrowMenu profileMenu;
-	profileMenu.header = user.name + ", This is your profile";
-	profileMenu.addOption("Name");
-	profileMenu.addOption("Number IC");
-	profileMenu.addOption("Phone Number ");
-	profileMenu.addOption("Email");
-	profileMenu.addOption("Address");
-	profileMenu.addOption("Username");
-	profileMenu.addOption("Password");
-	profileMenu.addOption("Reset");
-	profileMenu.addOption("Save");
-	profileMenu.addOption("Back");
-	profileMenu.addOption("Delete Account");
+    std::string tmpInput;
+    int option = 0;
 
-	string tmpInput;
-	int option = 0;
-	while (1) {
-		profileMenu.setValue(0, temp.name);
-		profileMenu.setValue(1, temp.numIc);
-		profileMenu.setValue(2, temp.phoneNum);
-		profileMenu.setValue(3, temp.email);
-		profileMenu.setValue(4, temp.address);
-		profileMenu.setValue(5, temp.username);
-		profileMenu.setValue(6, hideString(temp.getPassword()));
+    while (true) {
+        profileMenu.setValue(0, temp.name);
+        profileMenu.setValue(1, temp.numIc);
+        profileMenu.setValue(2, temp.phoneNum);
+        profileMenu.setValue(3, temp.email);
+        profileMenu.setValue(4, temp.address);
+        profileMenu.setValue(5, temp.username);
+        profileMenu.setValue(6, hideString(temp.getPassword()));
 
-		option = profileMenu.prompt(option);
-		switch (option)
-		{
-		case -1:
-			return user;
-			break;
-		case 0:
-			cout << "Insert Name:";
-			getline(cin, temp.name);
-			if (temp.name.empty()) {
-				cout << "Name cannot be empty. Please try again.\n";
-				_getch();
-			}
-			else {
-				profileMenu.setValue(0, temp.name);
-			}
-			break;
-		case 1:
-			cout << "Insert Number IC (991012110212):";
-			cin >> temp.numIc;
-			if (temp.numIc.length() == 12 && all_of(temp.numIc.begin(), temp.numIc.end(), ::isdigit)) {
-				profileMenu.setValue(1, temp.numIc);
-			}
-			else {
-				cout << "Number IC must be 12 characters long and contain only digits.\n";
-				_getch();
-			}
-			break;
-		case 2:
-			cout << "Insert Phone Number (0131234560):";
-			cin >> temp.phoneNum;
-			if ((temp.phoneNum.length() == 10 || temp.phoneNum.length() == 11) && all_of(temp.phoneNum.begin(), temp.phoneNum.end(), ::isdigit)) {
-				profileMenu.setValue(2, temp.phoneNum);
-			}
-			else {
-				cout << "Phone Number must be 10 or 11 digits long.\n";
-				_getch();
-			}
-			break;
-		case 3: {
-			cout << "Insert email (example@gmail.com):";
-			getline(cin, temp.email);
-			std::regex emailRegex(R"(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)");
-			if (std::regex_match(temp.email, emailRegex)) {
-				profileMenu.setValue(3, temp.email);
-			}
-			else {
-				cout << "Invalid email format. Please try again.\n";
-				_getch();
-			}
-			break;
-		}
-		case 4:
-			cout << "Insert Address:";
-			getline(cin, temp.address);
-			if (temp.address.empty()) {
-				cout << "Address cannot be empty. Please try again.\n";
-				_getch();
-			}
-			else {
-				profileMenu.setValue(4, temp.address);
-			}
-			break;
-		case 5:
-			cout << "Insert Username:";
-			cin >> temp.username;
-			if (temp.username.length() >= 4) { // Example: usernames should be at least 4 characters long
-				profileMenu.setValue(5, temp.username);
-			}
-			else {
-				cout << "Username must be at least 4 characters long. Please try again.\n";
-				_getch();
-			}
-			break;
-		case 6:
-			cout << "Insert current Password:";
-			tmpInput = hiddenInput();
-			if (user.MatchPasswordWith(tmpInput)) {
-				cout << endl;
-				cout << "Insert new Password:";
-				tmpInput = hiddenInput();
-				if (tmpInput.length() < 6) {
-					cout << "Password must be at least 6 character long";
-				}
-				else {
-					temp.setPassword(tmpInput);
-				}
-			}
-			else {
-				cout << "Invalid current password";
-				_getch();
-			}
-			break;
-		case 7:
-			temp = user;
-			break;
-		case 8:
-			user = temp;
-			user.update();
-			cout << "Updated";
-			_getch();
-			return user;
-			break;
-		case 9:
-			return user;
-			break;
-		case 10:
-			cout << "Delete your account? (y/n)";
-			char confirm;
-			confirm = _getch();
-			if (confirm == 'Y' || confirm == 'y') {
-				user = temp;
-				user.remove();
-				loginMenu();
-			}
-			break;
-		}
-	}
+        option = profileMenu.prompt(option);
+        
+        switch (option) {
+            case -1:
+                return user;
+                break;
+
+            case 0:
+                std::cout << "Insert Name:";
+                std::getline(std::cin, temp.name);
+                if (temp.name.empty()) {
+                    std::cout << "Name cannot be empty. Please try again.\n";
+                    _getch();
+                } else {
+                    profileMenu.setValue(0, temp.name);
+                }
+                break;
+
+            case 1:
+                std::cout << "Insert Number IC (991012110212):";
+                std::cin >> temp.numIc;
+                if (temp.numIc.length() == 12 && std::all_of(temp.numIc.begin(), temp.numIc.end(), ::isdigit)) {
+                    profileMenu.setValue(1, temp.numIc);
+                } else {
+                    std::cout << "Number IC must be 12 characters long and contain only digits.\n";
+                    _getch();
+                }
+                break;
+
+            case 2:
+                std::cout << "Insert Phone Number (0131234560):";
+                std::cin >> temp.phoneNum;
+                if ((temp.phoneNum.length() == 10 || temp.phoneNum.length() == 11) &&
+                    std::all_of(temp.phoneNum.begin(), temp.phoneNum.end(), ::isdigit)) {
+                    profileMenu.setValue(2, temp.phoneNum);
+                } else {
+                    std::cout << "Phone Number must be 10 or 11 digits long.\n";
+                    _getch();
+                }
+                break;
+
+            case 3: {
+                std::cout << "Insert email (example@gmail.com):";
+                std::getline(std::cin, temp.email);
+                std::regex emailRegex(R"(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)");
+                if (std::regex_match(temp.email, emailRegex)) {
+                    profileMenu.setValue(3, temp.email);
+                } else {
+                    std::cout << "Invalid email format. Please try again.\n";
+                    _getch();
+                }
+                break;
+            }
+
+            case 4:
+                std::cout << "Insert Address:";
+                std::getline(std::cin, temp.address);
+                if (temp.address.empty()) {
+                    std::cout << "Address cannot be empty. Please try again.\n";
+                    _getch();
+                } else {
+                    profileMenu.setValue(4, temp.address);
+                }
+                break;
+
+            case 5:
+                std::cout << "Insert Username:";
+                std::cin >> temp.username;
+                if (temp.username.length() >= 4) { // Example: usernames should be at least 4 characters long
+                    profileMenu.setValue(5, temp.username);
+                } else {
+                    std::cout << "Username must be at least 4 characters long. Please try again.\n";
+                    _getch();
+                }
+                break;
+
+            case 6:
+                std::cout << "Insert current Password:";
+                tmpInput = hiddenInput();
+                if (user.MatchPasswordWith(tmpInput)) {
+                    std::cout << std::endl;
+                    std::cout << "Insert new Password:";
+                    tmpInput = hiddenInput();
+                    if (tmpInput.length() < 6) {
+                        std::cout << "Password must be at least 6 characters long.\n";
+                        _getch();
+                    } else {
+                        temp.setPassword(tmpInput);
+                    }
+                } else {
+                    std::cout << "Invalid current password.\n";
+                    _getch();
+                }
+                break;
+
+            case 7:
+                temp = user;
+                break;
+
+            case 8:
+                user = temp;
+                user.update();
+                std::cout << "Updated";
+                _getch();
+                return user;
+                break;
+            case 9:
+                return user;
+                break;
+
+            case 10:
+                std::cout << "Delete your account? (y/n)";
+                char confirm;
+                confirm = _getch();
+                if (confirm == 'Y' || confirm == 'y') {
+                    user = temp;
+                    user.remove();
+                    loginMenu(); // Assuming you have a function named loginMenu() to handle login actions
+                }
+                break;
+        }
+    }
 }
 
 void roomsUser(Account user) {
@@ -550,8 +567,6 @@ Reservation roomType(Account user, int rType, Reservation trolley) {
 		else {
 			roomMenu.setValue(4, "Descending");
 		}
-
-
 		switch (roomMenu.prompt()) {
 
 		case -1:
@@ -609,8 +624,8 @@ Reservation roomType(Account user, int rType, Reservation trolley) {
 				<< setw(42) << "+" << setfill(' ') << endl;
 
 			for (const auto& room : roomType) {
-				tmpString << "|" << left << setw(5) << room.roomID << " |"
-					<< setw(20) << room.name << " |" 
+				tmpString << "|" << left << setw(5) << room.roomId << " |"
+					<< setw(20) << room.roomNum << " |"
 					<< setw(10) << fixed << setprecision(2)  << room.price << " |"
 					<< right <<setw(40) << room.description << " |" << endl;
 				roomSelect.addOption(tmpString.str());  // Ensure this is being called
@@ -621,7 +636,7 @@ Reservation roomType(Account user, int rType, Reservation trolley) {
 			while (1) {
 				selectedRoom = roomSelect.prompt(selectedRoom);
 				if (selectedRoom != -1) { // if not escape pressed process it
-					trolley = roomDetails(user, roomType[selectedRoom].roomID, trolley);
+					trolley = roomDetails(user, roomType[selectedRoom].roomId, trolley);
 				}
 				else {
 					break;
@@ -632,9 +647,9 @@ Reservation roomType(Account user, int rType, Reservation trolley) {
 	};
 }
 
-Reservation roomDetails(Account user, int roomID, Reservation trolley) {
-	roomVariety rooms = roomVariety::findRoom(roomID);
-	if (rooms.roomID == 0) {
+Reservation roomDetails(Account user, int roomId, Reservation trolley) {
+	roomVariety rooms = roomVariety::findRoom(roomId);
+	if (rooms.roomId == 0) {
 		// default id, which means the product doesn't exist since there is no 0 id in the database
 		cout << "Product not found";
 		_getch();
@@ -642,8 +657,8 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley) {
 	}
 	ArrowMenu productMenu;
 	productMenu.addOption("Add to Trolley ");
-	productMenu.header = "Product Details:\n"
-		"\nName\t: " + rooms.name
+	productMenu.header = "Room Details:\n"
+		"\nName\t: " + rooms.roomNum
 		+ "\nAvailable\t: " + rooms.availability
 		+ "\nPrice\t: " + to_string(rooms.price);
 
@@ -654,19 +669,8 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley) {
 		}
 			   break;
 		case 0: {
-			int qty;
+			int quantity = 1;
 			std::string checkInDate, checkOutDate;
-
-			while (true) {
-				cout << "Insert Quantity: ";
-				cin >> qty;
-				if (qty > 0) {
-					break; // valid quantity
-				}
-				else {
-					cout << "Quantity must be greater than 0. Please try again.\n";
-				}
-			}
 
 			while (true) {
 				cout << "Insert Check-In Date (YYYY-MM-DD): ";
@@ -684,7 +688,7 @@ Reservation roomDetails(Account user, int roomID, Reservation trolley) {
 				}
 			}
 			cout << "Add to Cart";
-			trolley.addQuantity(rooms, qty, checkInDate, checkOutDate);
+			trolley.addQuantity(rooms,quantity, checkInDate, checkOutDate);
 			_getch();
 			break;
 		}
@@ -703,24 +707,21 @@ Reservation trolleyMenu(Account user, Reservation trolley) {
 	stringstream ss;
 	ss << "|" << left << setw(15) << "Room Number" << " |"
 		<< setw(10) << "Price|" << " |"
-		<< setw(10) << "Quantity" << " |"
 		<< setw(20) << "Check In Date" << " |"
 		<< setw(20) << "Check Out Date" << " |"
 		<< right << setw(15) << "Subtotal" << " |" << endl;
 
 	ss << "+" << setfill('-') << setw(17) << "+" << setw(12) 
-		<< "+" << setw(12) << "+" <<setw(22) << "+" << setw(22) << "+" 
+	    << "+" <<setw(22) << "+" << setw(22) << "+" 
 		<< setw(17) <<"+" << setfill(' ') << endl;
 
 	for (const auto& item : trolley.items) {
-		ss << "|" << left << setw(15) << item.first.name << " |"
+		ss << "|" << left << setw(15) << item.first.roomNum << " |"
 			<< setw(10) << fixed << setprecision(2) << item.first.price << " |"
-			<< setw(10)<< item.second << " |"
 			<< setw(20) << item.first.checkInDate << " |"
 			<< setw(20) << item.first.checkOutDate << " |"
 			<< right << setw(15) << fixed << setprecision(2) << (item.first.price * item.second) << " |" << endl;
 	}
-	//ss << setw(20) << "SUM" << setw(10) << "" << setw(10) << trolley.count() << setw(10) << trolley.total();
 	trolleyM.header = "Checkout Items\n\n" + ss.str();
 	char confirm;
 	while (1)
@@ -765,7 +766,7 @@ void feedbackUser(Account user)
 
 	while (1)
 	{
-		feedM.header = "WMA Hotel Feedback , " + user.name;
+		feedM.header = "Hotel Feedback , " + user.name;
 		switch (feedM.prompt())
 		{
 		case -1:
@@ -889,8 +890,8 @@ Booking bookingUser(Account user, Booking view) {
 		<< "+" << setw(12) << "+" << setfill(' ') << endl;
 
 	for (const auto& room : displayBooking) {
-		tmpString << "|" << left << setw(10) << room.reservationID << " |"
-			<< setw(10) << room.roomName << " |"
+		tmpString << "|" << left << setw(10) << room.reservationId << " |"
+			<< setw(10) << room.roomNum << " |"
 			<< setw(10) << room.quantity << " |"
 			<< setw(15) << room.checkInDate << " |"
 			<< setw(15) << room.checkOutDate << " |"
@@ -1003,7 +1004,7 @@ void roomsAdmin(Account user) {
 
 	ArrowMenu bedroomM;
 	bedroomM.header = "Please Select One";
-	bedroomM.addOption("Add Room Type ");
+	//bedroomM.addOption("Add Room Type ");
 	bedroomM.addOption("Add Room ");
 	bedroomM.addOption("View Room ");
 
@@ -1015,13 +1016,13 @@ void roomsAdmin(Account user) {
 		case -1:
 			return;
 			break;
-		case 0:
+		/*case 0:
 			addRoomTypeAdmin(user);
-			break;
-		case 1:
+			break;*/
+		case 0:
 			addRoomAdmin(user);
 			break;
-		case 2:
+		case 1:
 			newBedroom = viewRoomAdmin(user, newBedroom);
 			break;
 		}
@@ -1057,14 +1058,14 @@ roomVariety viewRoomAdmin(Account user, roomVariety newBedroom){
 
 	for (const auto& room : dispRoom) {
 		// Data rows with vertical lines and left/right borders
-		tmpAdmin << "|" << left << setw(8) << room.roomID << " |"
-			<< setw(23) << room.name << " |"
+		tmpAdmin << "|" << left << setw(8) << room.roomId << " |"
+			<< setw(23) << room.roomNum << " |"
 			<< setw(40) << room.description << " |"
 			<< setw(14) << room.availability << " |"
 			<< right << setw(14) << fixed << setprecision(2) << room.price << " |" << endl;
 	}
 
-	roomMenu.header = "List of Room at WMA Hotel\n\n" + tmpAdmin.str();
+	roomMenu.header = "List of Room \n\n" + tmpAdmin.str();
 	
 	int option = 0;
 	while (1) {
@@ -1105,8 +1106,8 @@ Booking bookingAdmin(Account user, Booking view)
 		<< "+" << setw(12) << "+" << setfill(' ') << endl;
 
 	for (const auto& room :displayBooking) {
-		tmpString << "|" << left << setw(10) << room.reservationID << " |"
-			<< setw(10) << room.roomName << " |"
+		tmpString << "|" << left << setw(10) << room.reservationId << " |"
+			<< setw(10) << room.roomNum << " |"
 			<< setw(10) << room.quantity << " |"
 			<< setw(15) << room.checkInDate << " |"
 			<< setw(15) << room.checkOutDate << " |"
@@ -1136,7 +1137,7 @@ void addRoomTypeAdmin(Account user)
 	Bedroom newRoomType;
 
 	ArrowMenu roomAdd;
-	roomAdd.header = "Welcome to WMA Hotel , " + user.name;
+	roomAdd.header = "Welcome to Hotel Booking Management System , " + user.name;
 	roomAdd.addOption("Insert Room Type ");
 	roomAdd.addOption("Insert Room Capacity ");
 	roomAdd.addOption("Insert Room Description ");
@@ -1211,7 +1212,7 @@ void addRoomAdmin(Account user)
 
 	// Data rows with vertical lines
 	for (const auto& room : displayRoom) {
-		tmpAdmin << setw(5) << room.roomtypeID << " | "
+		tmpAdmin << setw(5) << room.roomTypeId << " | "
 			<< setw(20) << room.type << " | "
 			<< setw(20) << room.capacity << " | "
 			<< setw(40) << room.description << " |" << endl;
@@ -1235,8 +1236,8 @@ void addRoomAdmin(Account user)
 		case 1:
 			cout << "Insert Room Number: ";
 			cin.ignore(); 
-			cin >> nRoom.name;
-			roomMenu.setValue(1, nRoom.name);
+			cin >> nRoom.roomNum;
+			roomMenu.setValue(1, nRoom.roomNum);
 			break;
 		case 2:
 			cout << "Insert Room Price: ";

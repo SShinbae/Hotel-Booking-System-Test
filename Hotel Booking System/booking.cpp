@@ -8,27 +8,27 @@ Booking::Booking()
 }
 
 Booking::Booking(ResultSet* data) {
-	reservationID = data->getInt("reservationID");
-	rID = data->getInt("rID");
+	reservationId = data->getInt("reservationId");
+	rId = data->getInt("rId");
 	user = data->getInt("user");
 	quantity = data->getInt("quantity");
 	checkInDate = data->getString("checkInDate");
 	checkOutDate = data->getString("checkOutDate");
-	roomName = data->getString("roomName");
+	roomNum = data->getString("roomNum");
 	price = data->getDouble("price");
 }
 
-Booking::Booking(int reservationID, int rID, int quantity, int user, double price, 
-	std::string checkInDate, std::string checkOutDate,std::string roomName)
+Booking::Booking(int reservationId, int rId, int quantity, int user, double price, 
+	std::string checkInDate, std::string checkOutDate,std::string roomNum)
 {
 	
-	this->reservationID = reservationID;
-	this->rID = rID;
+	this->reservationId = reservationId;
+	this->rId = rId;
 	this->user = user;
 	this->quantity = quantity;
 	this->checkInDate = checkInDate;
 	this->checkOutDate = checkOutDate;
-	this->roomName = roomName;
+	this->roomNum = roomNum;
 	this->price = price;
 }
 
@@ -41,14 +41,14 @@ void Booking::insert() {
 
 	DBConnection db;//instantiate
 	try {
-		db.prepareStatement("INSERT INTO booking (rID, user, quantity, checkInDate, checkOutDate, roomName, price) VALUES (?,?,?,?,?,?,?,?)");
+		db.prepareStatement("INSERT INTO booking (rId, user, quantity, checkInDate, checkOutDate, roomNum, price) VALUES (?,?,?,?,?,?,?,?)");
 		
-		db.stmt->setInt(1, rID);
+		db.stmt->setInt(1, rId);
 		db.stmt->setInt(2, user);
 		db.stmt->setInt(3, quantity);
 		db.stmt->setString(4, checkInDate);
 		db.stmt->setString(5, checkOutDate);
-		db.stmt->setString(6, roomName);
+		db.stmt->setString(6, roomNum);
 		db.stmt->setDouble(7, price);
 		db.QueryStatement();
 
@@ -92,7 +92,7 @@ void Booking::updateRoomTypeCapacity(int roomTypeId, int increment)
 		DBConnection db;
 
 		try {
-			std::string query = "UPDATE roomtypes SET capacity = capacity + ? WHERE roomtypeID = ?";
+			std::string query = "UPDATE roomtypes SET capacity = capacity + ? WHERE roomTypeId = ?";
 			db.prepareStatement(query);
 			db.stmt->setInt(1, increment); // Increment value
 			db.stmt->setInt(2, roomTypeId); // Room Type ID

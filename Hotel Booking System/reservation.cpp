@@ -9,7 +9,7 @@ using namespace std;
 
 Reservation::Reservation() {
 	dateTime = "";
-	reservationID = 0;
+	reservationId = 0;
 	user = 0;
 }
 
@@ -20,11 +20,11 @@ void Reservation::insert() {
 	db.prepareStatement("INSERT INTO reservation(user) VALUES (?)");
 	db.stmt->setInt(1, user);
 	db.QueryStatement();
-	reservationID = db.getGeneratedId();
+	reservationId = db.getGeneratedId();
 	// get back the generated id to be used during insertion of booking
 
     // Ensure the number of placeholders matches the number of columns
-    string query = "INSERT INTO `booking`(`reservationID`, `rID`, `quantity`,  `checkInDate`, `checkOutDate`, `user`, `price`, `roomName`) VALUES ";
+    string query = "INSERT INTO `booking`(`reservationId`, `rId`, `quantity`,  `checkInDate`, `checkOutDate`, `user`, `price`, `roomNum`) VALUES ";
     for (int i = 0; i < items.size(); i++) {
         query += "(?,?,?,?,?,?,?,?),"; // 9 placeholders for 9 columns
     }
@@ -34,22 +34,22 @@ void Reservation::insert() {
         db.prepareStatement(query);
         for (int i = 0; i < items.size(); i++) {
             int base = i * 8;
-            db.stmt->setInt(base + 1, reservationID);
-            db.stmt->setInt(base + 2, items[i].first.roomID);
+            db.stmt->setInt(base + 1, reservationId);
+            db.stmt->setInt(base + 2, items[i].first.roomId);
             db.stmt->setInt(base + 3, items[i].second); // Quantity
             db.stmt->setString(base + 4, items[i].first.checkInDate);
             db.stmt->setString(base + 5, items[i].first.checkOutDate);
             db.stmt->setInt(base + 6, user);
             db.stmt->setDouble(base + 7, items[i].first.price * items[i].second);
-            db.stmt->setString(base + 8, items[i].first.name);
+            db.stmt->setString(base + 8, items[i].first.roomNum);
         }
         db.QueryStatement();
 
         // Now, update the room availability for each room booked.
         for (const auto& item : items) {
-            string updateQuery = "UPDATE room SET availability = 'Occupied' WHERE roomID = ?";
+            string updateQuery = "UPDATE room SET availability = 'Occupied' WHERE roomId = ?";
             db.prepareStatement(updateQuery);
-            db.stmt->setInt(1, item.first.roomID); // Bind the room ID parameter
+            db.stmt->setInt(1, item.first.roomId); // Bind the room ID parameter
             db.QueryStatement();
 
         }
@@ -105,7 +105,7 @@ void Reservation::addQuantity(roomVariety room, int quantity, std::string checkI
     // You can now use 'days' to calculate the price if needed
     room.price *= days; // For example, if price is per day
 
-    items.push_back({ room, quantity }); // Add room and quantity
+    items.push_back({room, 1}); // Add room and quantity
 }
 
 

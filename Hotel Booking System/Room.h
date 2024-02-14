@@ -9,8 +9,8 @@
 class roomVariety
 {
 public:
-	int roomID, rType, quantity, user;
-	std::string name, availability, checkInDate, checkOutDate, description;
+	int roomId, rType, quantity, user, days;
+	std::string roomNum, availability, checkInDate, checkOutDate, description;
 	double price;
 
 	roomVariety();
@@ -18,7 +18,7 @@ public:
 
 	~roomVariety();
 
-	static roomVariety findRoom(int roomID);
+	static roomVariety findRoom(int roomId);
 
 	static std::vector<roomVariety> findRooms();
 

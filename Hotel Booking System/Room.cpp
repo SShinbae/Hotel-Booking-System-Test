@@ -3,8 +3,8 @@
 using namespace std;
 
 roomVariety::roomVariety() {
-	roomID = 0;
-	name = "";
+	roomId = 0;
+	roomNum = "";
 	rType = 0;
 	price = 0;
 	availability = "";
@@ -13,8 +13,8 @@ roomVariety::roomVariety() {
 }
 
 roomVariety::roomVariety(sql::ResultSet* data) {
-	roomID = data->getInt("roomID");
-	name = data->getString("name");
+	roomId = data->getInt("roomId");
+	roomNum = data->getString("roomNum");
 	rType = data->getInt("rType");
 	price = data->getDouble("price");
 	availability = data->getString("availability");
@@ -62,9 +62,9 @@ void roomVariety::insertR()
 {
 	DBConnection db;//instantiate
 	try {
-		db.prepareStatement("INSERT INTO room (rType, name, price, description, availability) VALUES (?,?,?,?,?)");
+		db.prepareStatement("INSERT INTO room (rType, roomNum, price, description, availability) VALUES (?,?,?,?,?)");
 		db.stmt->setInt(1, rType);
-		db.stmt->setString(2, name);
+		db.stmt->setString(2, roomNum);
 		db.stmt->setDouble(3, price);
 		db.stmt->setString(4, description);
 		db.stmt->setString(5, availability);
@@ -87,10 +87,10 @@ void roomVariety::setAvailability(const std::string& type){
 }
 
 
-roomVariety roomVariety::findRoom(int roomID) {
+roomVariety roomVariety::findRoom(int roomId) {
 	DBConnection db;
-	db.prepareStatement("SELECT * FROM room WHERE roomID=?");
-	db.stmt->setInt(1, roomID);
+	db.prepareStatement("SELECT * FROM room WHERE roomId=?");
+	db.stmt->setInt(1, roomId);
 	db.QueryResult();
 
 	roomVariety result;

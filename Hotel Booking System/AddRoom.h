@@ -11,13 +11,13 @@ class Bedroom{
 public:
 
     //roomtypes
-    int roomtypeID, capacity;
+    int roomTypeId, capacity;
     std::string type, description;
    
 
     Bedroom();
 
-    Bedroom(int roomtypeID, int capacity, std::string type, std::string description);
+    Bedroom(int roomTypeId, int capacity, std::string type, std::string description);
 
     Bedroom(sql::ResultSet* data);
 

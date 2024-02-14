@@ -13,11 +13,11 @@ Account::Account() {
 	phoneNum = "";
 	name = "";
 	address = "";
-	usertype = "";
+	userType = "";
 }
 
 
-Account::Account(int userId, std::string  numIc, std::string  phoneNum, std::string username, std::string password, std::string email, std::string name, std::string address, std::string usertype) {
+Account::Account(int userId, std::string  numIc, std::string  phoneNum, std::string username, std::string password, std::string email, std::string name, std::string address, std::string userType) {
 	this->userId = userId;
 	this->name = name;
 	this->numIc = numIc;
@@ -26,7 +26,7 @@ Account::Account(int userId, std::string  numIc, std::string  phoneNum, std::str
 	this->phoneNum = phoneNum;
 	this->email = email;
 	this->address = address;
-	this->usertype = usertype;
+	this->userType = userType;
 }
 
 
@@ -49,12 +49,12 @@ bool Account::login() {
 			address = db.res->getString("address");
 
 			// Retrieve the role from the database
-			usertype = db.res->getString("usertype");
+			userType = db.res->getString("userType");
 			//check if user is admin
-			if (usertype == "admin") {
+			if (userType == "admin") {
 				isAdmin = true;  
 			}
-			else if (usertype == "user") {
+			else if (userType == "user") {
 				isAdmin = false;  
 			}
 			
@@ -71,7 +71,7 @@ bool Account::login() {
 void Account::insert() {
 
 	DBConnection db;//instantiate
-	db.prepareStatement("Insert into user (username,password,name, email, phoneNum, numIc, address, usertype) VALUES (?,?,?,?,?,?,?,?)");
+	db.prepareStatement("Insert into user (username,password,name, email, phoneNum, numIc, address, userType) VALUES (?,?,?,?,?,?,?,?)");
 	db.stmt->setString(1, username);
 	db.stmt->setString(2, password);
 	db.stmt->setString(3, name);
@@ -79,7 +79,7 @@ void Account::insert() {
 	db.stmt->setString(5, phoneNum);
 	db.stmt->setString(6, numIc);
 	db.stmt->setString(7, address);
-	db.stmt->setString(8, usertype);
+	db.stmt->setString(8, userType);
 	db.QueryStatement();
 	db.~DBConnection();
 }
@@ -113,12 +113,12 @@ void Account::remove() {
 // to check user role
 std::string Account::getRole()
 {
-	return usertype;
+	return userType;
 }
 
 //to get usertype == user
 void Account::setUsertype(const std::string& type) {
-	usertype = type;
+	userType = type;
 }
 
 Account::~Account() {

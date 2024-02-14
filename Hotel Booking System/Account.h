@@ -7,13 +7,13 @@
 class Account {
 public:
     int userId;
-    std::string username, numIc, phoneNum, email, name, address, usertype;
+    std::string username, numIc, phoneNum, email, name, address, userType;
     bool isAdmin;
     
 
     Account();
     
-    Account(int userId, std::string username, std::string password, std::string email, std::string numIc, std::string phoneNum, std::string name, std::string address, std::string usertype);
+    Account(int userId, std::string username, std::string password, std::string email, std::string numIc, std::string phoneNum, std::string name, std::string address, std::string userType);
             
     bool login();
     void insert();

@@ -12,16 +12,16 @@
 class Booking
 {
 public:
-	int reservationID, rID, quantity,  user;
-	std::string checkInDate, checkOutDate, roomName;
+	int reservationId, rId, quantity,  user;
+	std::string checkInDate, checkOutDate, roomNum;
 	double price;
 	Booking();
 
 	Booking(sql::ResultSet* data);
 
-	Booking(int reservationID, int rID, int quantity, int user, double price, std::string checkInDate, std::string checkOutDate, std::string roomName);
-	static std::vector<Booking> bookingConfirmation(int reservationID, int rID, int quantity, 
-		int user,int price, std::string checkInDate, std::string checkOutDate,std::string roomName);
+	Booking(int reservationId, int rId, int quantity, int user, double price, std::string checkInDate, std::string checkOutDate, std::string roomNum);
+	static std::vector<Booking> bookingConfirmation(int reservationId, int rId, int quantity, 
+		int user,int price, std::string checkInDate, std::string checkOutDate,std::string roomNum);
 	
 	void insert();
 

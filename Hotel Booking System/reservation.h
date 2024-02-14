@@ -11,7 +11,7 @@ class Reservation
 public:
 
 	std::string dateTime, checkInDate, checkOutDate;
-	int reservationID, user;
+	int reservationId, user, days;
 	
 	
 
