@@ -4,18 +4,31 @@
 
 #include <string>
 #include <vector>
+#include <utility>
+#include <iostream>
 #include "DBConnect.h"
+#include "Room.h"
 
 class Booking
 {
 public:
-	std::string checkInDate, checkOutDate, roomType;
-	double value;
+	int reservationId, rId, quantity,  user;
+	std::string checkInDate, checkOutDate, roomNum;
+	double price;
+	Booking();
 
 	Booking(sql::ResultSet* data);
 
-	static std::vector<Booking> bookingConfirmation(std::string checkIn, std::string checkOut, std::vector<int> roomTypeId, bool sortByDate, bool ascending);
+	Booking(int reservationId, int rId, int quantity, int user, double price, std::string checkInDate, std::string checkOutDate, std::string roomNum);
+	static std::vector<Booking> bookingConfirmation(int reservationId, int rId, int quantity, 
+		int user,int price, std::string checkInDate, std::string checkOutDate,std::string roomNum);
 	
+	void insert();
+
+	static std::vector<Booking> findBooking(int user);
+	static std::vector<Booking> findBookingAdmin();
+	static void updateRoomTypeCapacity(int roomTypeId, int increment);
+
 	~Booking() {
 
 	};

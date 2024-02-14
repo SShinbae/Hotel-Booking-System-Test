@@ -131,6 +131,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="account.cpp" />
+    <ClCompile Include="AddRoom.cpp" />
     <ClCompile Include="Arrowmenu.cpp" />
     <ClCompile Include="booking.cpp" />
     <ClCompile Include="DBConnect.cpp" />
@@ -142,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Account.h" />
+    <ClInclude Include="AddRoom.h" />
     <ClInclude Include="Arrowmenu.h" />
     <ClInclude Include="booking.h" />
     <ClInclude Include="DBConnect.h" />

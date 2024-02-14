@@ -5,46 +5,59 @@ using namespace std;
 
 Account::Account() {
 	//initialize
-	customerID = 0;
+	userId = 0;
 	username = "";
 	password = "";
 	email = "";
-	numIC = "";
+	numIc = "";
 	phoneNum = "";
 	name = "";
 	address = "";
+	userType = "";
 }
 
 
-Account::Account(int customerID, std::string  numIC, std::string  phoneNum, std::string username, std::string password, std::string email, std::string name, std::string address) {
-	this->customerID = customerID;
+Account::Account(int userId, std::string  numIc, std::string  phoneNum, std::string username, std::string password, std::string email, std::string name, std::string address, std::string userType) {
+	this->userId = userId;
 	this->name = name;
-	this->numIC = numIC;
+	this->numIc = numIc;
 	this->username = username;
 	this->password = password;
 	this->phoneNum = phoneNum;
 	this->email = email;
 	this->address = address;
+	this->userType = userType;
 }
 
 
 bool Account::login() {
 
 	DBConnection db;
-	db.prepareStatement("SELECT * FROM customer WHERE username=? AND password=?");
+	db.prepareStatement("SELECT * FROM user WHERE username=? AND password=?");
 	db.stmt->setString(1, username);
 	db.stmt->setString(2, password);
 	db.QueryResult();
 	if (db.res->rowsCount() == 1) {
 		while (db.res->next()) {
-			customerID = db.res->getInt("customerID");
+			userId = db.res->getInt("userId");
 			name = db.res->getString("name");
-			numIC = db.res->getString("numIC");
+			numIc = db.res->getString("numIc");
 			phoneNum = db.res->getString("phoneNum");
 			username = db.res->getString("username");
 			password = db.res->getString("password");
 			email = db.res->getString("email");
 			address = db.res->getString("address");
+
+			// Retrieve the role from the database
+			userType = db.res->getString("userType");
+			//check if user is admin
+			if (userType == "admin") {
+				isAdmin = true;  
+			}
+			else if (userType == "user") {
+				isAdmin = false;  
+			}
+			
 		}
 		db.~DBConnection();
 		return true;
@@ -58,14 +71,15 @@ bool Account::login() {
 void Account::insert() {
 
 	DBConnection db;//instantiate
-	db.prepareStatement("Insert into customer (username,password,name, email, phoneNum, numIC, address) VALUES (?,?,?,?,?,?,?)");
+	db.prepareStatement("Insert into user (username,password,name, email, phoneNum, numIc, address, userType) VALUES (?,?,?,?,?,?,?,?)");
 	db.stmt->setString(1, username);
 	db.stmt->setString(2, password);
 	db.stmt->setString(3, name);
 	db.stmt->setString(4, email);
 	db.stmt->setString(5, phoneNum);
-	db.stmt->setString(6, numIC);
+	db.stmt->setString(6, numIc);
 	db.stmt->setString(7, address);
+	db.stmt->setString(8, userType);
 	db.QueryStatement();
 	db.~DBConnection();
 }
@@ -73,15 +87,15 @@ void Account::insert() {
 void Account::update() {
 
 	DBConnection db;
-	db.prepareStatement("UPDATE customer SET username=?, password=?, name=?, email=?, phoneNum=?, numIC=?, address=? WHERE customerID=?");
+	db.prepareStatement("UPDATE user SET username=?, password=?, name=?, email=?, phoneNum=?, numIc=?, address=? WHERE userId=?");
 	db.stmt->setString(1, username);
 	db.stmt->setString(2, password);
 	db.stmt->setString(3, name);
 	db.stmt->setString(4, email);
 	db.stmt->setString(5, phoneNum);
-	db.stmt->setString(6, numIC);
+	db.stmt->setString(6, numIc);
 	db.stmt->setString(7, address);
-	db.stmt->setInt(8, customerID);
+	db.stmt->setInt(8, userId);
 	db.QueryStatement();
 	db.~DBConnection();
 
@@ -89,13 +103,23 @@ void Account::update() {
 
 void Account::remove() {
 	DBConnection db;
-	db.prepareStatement("DELETE FROM customer WHERE customerID=?");
-	db.stmt->setInt(1, customerID);
+	db.prepareStatement("DELETE FROM user WHERE userId=?");
+	db.stmt->setInt(1, userId);
 	db.QueryStatement();
 
 	db.~DBConnection();
 }
 
+// to check user role
+std::string Account::getRole()
+{
+	return userType;
+}
+
+//to get usertype == user
+void Account::setUsertype(const std::string& type) {
+	userType = type;
+}
 
 Account::~Account() {
 

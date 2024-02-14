@@ -1,10 +1,7 @@
-#include <iostream>
-#include <ctime>
-#include <vector>
 #include "feedback.h"
 #include "DBConnect.h"
+#include <vector>
 #include <iomanip>
-#include "Account.h"
 
 using namespace std;
 
@@ -13,16 +10,16 @@ Feedback::Feedback() {
 	feedBackId = 0;
 	user = 0;
 	messages = "";
-	feedBackTypes = "";
+	date = "";
 }
 
 
 
-Feedback::Feedback(int feedBackId, int user, std::string messages, std::string feedBackTypes) {
+Feedback::Feedback(int feedBackId, int user, std::string messages, std::string date) {
 	this->feedBackId = feedBackId;
 	this->user = user;
 	this->messages = messages;
-	this->feedBackTypes = feedBackTypes;
+	this->date = date;
 	
 }
 
@@ -30,76 +27,104 @@ Feedback::Feedback(sql::ResultSet* data) {
 	feedBackId = data->getInt("feedBackId");
 	user = data->getInt("user");
 	messages = data->getString("messages");
-	feedBackTypes = data->getString("feedBackTypes");
+	date = data->getString("date");
 	
 }
 
-Feedback::~Feedback()
+
+
+/*vector<Feedback> Feedback::displayFeedback(int user)
 {
-}
-/*
-Feedback Feedback::findFeedback(int user) {
-
-	//DBConnection db;
-	/*db.prepareStatement("SELECT * FROM feedback WHERE custId=?");
-	db.stmt->setInt(1, custId);
 	
-	db.QueryResult();
-	if (db.res->rowsCount() == 1) {
-		while (db.res->next()) {
-			custId = db.res->getInt("custId");
-			feedBackId = db.res->getInt("feedBackId");
-			messages = db.res->getString("messages");
-			phoneNum = db.res->getString("phoneNum");
-			username = db.res->getString("username");
-			password = db.res->getString("password");
-			email = db.res->getString("email");
-			address = db.res->getString("address");
-		}
-		db.~DBConnection();
-		return true;
-	}
+	string sql = "SELECT * from feedback WHERE user = ?";
 
-	vector<Feedback> items;
 	DBConnection db;
-	db.prepareStatement("SELECT * FROM feedback WHERE custId= ?");
-	db.stmt->setInt(1, custId);
+	db.prepareStatement(sql);
+	
 
+	vector<Feedback> result;
 	
 	db.QueryResult();
-	Feedback dispF;
 
-	if (db.res->rowsCount() > 0) {
+	if (db.res->rowsCount() >0 ) {
 
 		while (db.res->next()) {
-			Feedback found(db.res);
-			dispF = found;
+			feedBackId = db.res->getInt("feedBackId");
+			user = db.res->getInt("user");
+			messages = db.res->getString("messages");
 
 		}
 	}
-
 	db.~DBConnection();
-	return dispF;
-	
-}*/
-
+	return result;
+}
+*/
 void Feedback::insert() {
 	
 	DBConnection db;//instantiate
-
-	/*std::string query = "SELECT custId FROM feedback WHERE custId = ?";
-	db.prepareStatement(query);
-	db.stmt->setInt(1, custId);
-
-
-	db.QueryResult();*/
-
-	db.prepareStatement("Insert into feedback (user, messages,feedBackTypes) VALUES (?,?,?)");
+	db.prepareStatement("Insert into feedback (user,messages) VALUES (?,?)");
 	db.stmt->setInt(1, user);
 	db.stmt->setString(2, messages);
-	db.stmt->setString(3, feedBackTypes);
 	db.QueryStatement();
 	db.~DBConnection();
 }
 
 
+Feedback::~Feedback()
+{
+}
+
+std::vector<Feedback> Feedback::findFeedback(int user)
+{
+	string query = "SELECT * FROM `feedback` WHERE user = ?";
+
+	// 
+	DBConnection db;
+	
+	db.prepareStatement(query);
+	
+	db.stmt->setInt(1, user);
+
+	vector<Feedback> products;
+
+	db.QueryResult();
+
+	if (db.res->rowsCount() > 0) {
+
+		while (db.res->next()) {
+			Feedback tmpProduct(db.res);
+			products.push_back(tmpProduct);
+
+		}
+	}
+
+	//db.~DBConnection();
+	return products;
+	
+}
+
+std::vector<Feedback> Feedback::findFeedbackAdmin()
+{
+	string query = "SELECT * FROM `feedback`";
+
+	// 
+	DBConnection db;
+
+	db.prepareStatement(query);
+	vector<Feedback> products;
+	db.QueryResult();
+
+	if (db.res->rowsCount() > 0) {
+
+		while (db.res->next()) {
+			Feedback tmpProduct(db.res);
+			products.push_back(tmpProduct);
+
+		}
+	}
+
+	//db.~DBConnection();
+	return products;
+}
+
+	

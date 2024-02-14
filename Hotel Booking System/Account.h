@@ -6,27 +6,25 @@
 #include <vector>
 class Account {
 public:
-    int customerID;
-    std::string username, numIC, phoneNum, email, name, address;
-
+    int userId;
+    std::string username, numIc, phoneNum, email, name, address, userType;
+    bool isAdmin;
     
 
     Account();
     
-    Account(int customerID, std::string username, std::string password, std::string email, std::string numIC, std::string phoneNum, std::string name, std::string address);
+    Account(int userId, std::string username, std::string password, std::string email, std::string numIc, std::string phoneNum, std::string name, std::string address, std::string userType);
             
     bool login();
     void insert();
     void update();
     void remove();
 
+    std::string getRole();
+
+    void setUsertype(const std::string& type);
 
     ~Account();
-
-    //static Account findFeedback(int  customerID);
-
-    static Account older(Account a, Account b);
-    //void setNumIC(std::string numIC);
 
     void setPassword(std::string pass);
     std::string getPassword();
@@ -38,7 +36,7 @@ private:
     std::string encrypt(std::string input);
     char toChar(int asciiDecimal);
     bool isMatch(std::string encrypted, std::string testText);
-
+    
     
 };
 

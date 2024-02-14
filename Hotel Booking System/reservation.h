@@ -11,17 +11,19 @@ class Reservation
 public:
 
 	std::string dateTime, checkInDate, checkOutDate;
-	int reservationID, user;
+	int reservationId, user, days;
+	
 	
 
 	std::vector<std::pair<roomVariety,int>> items; // pair of product and its quantity, represents the transaction_item table
 
 	Reservation();
-	//void addRoom(RoomTypes room, int quantity,int pax);
-	void addRoom(roomVariety room, int quantity);
+	void addQuantity(roomVariety room, int quantity,  std::string checkInDate, std::string checkOutDate);
 	void insert();
 	double total();
 	int count();
+
+	bool isCheckOutAfterCheckIn(const std::string& checkInDate, const std::string& checkOutDate);
 };
 
 

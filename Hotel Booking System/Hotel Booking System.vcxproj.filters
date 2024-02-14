@@ -42,6 +42,9 @@
     <ClCompile Include="feedback.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AddRoom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Account.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="feedback.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AddRoom.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

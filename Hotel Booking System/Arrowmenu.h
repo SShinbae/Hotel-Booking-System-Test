@@ -27,6 +27,7 @@ public:
 	void addOption(std::string option, std::string value = "");
 	void setValue(int index, std::string text);
 	void clearOption();
+	void display();
 
 
 	ArrowMenu();
